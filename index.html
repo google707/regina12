@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MozVoice - Chamadas de Áudio Aleatórias</title>
-    <!-- ✅ Corrigido: URL correta e versão específica -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.2"></script>
     <style>
         :root {
@@ -400,9 +399,9 @@
     </div>
 
     <script>
-        // ✅ CREDENCIAIS DO SUPABASE
-        const SUPABASE_URL = 'https://lsgbijmmxredmqxyxnsp.supabase.co'; // ✅ Sem espaços
-        const SUPABASE_ANON_KEY = 'sb_publishable_bD8yP5WqAe1TCO5WXcRWgg_-GfCfcNt'; // ✅ Chave pública (funciona)
+        // 🔑 CREDENCIAIS DO SUPABASE
+        const SUPABASE_URL = 'https://lsgbijmmxredmqxyxnsp.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_bD8yP5WqAe1TCO5WXcRWgg_-GfCfcNt';
 
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -433,8 +432,6 @@
         let isCaller = false;
         let volumeInterval = null;
         let audioContext = null;
-        let analyserLocal = null;
-        let analyserRemote = null;
         let searchTimeout = null;
 
         // Config WebRTC
@@ -584,14 +581,41 @@
             }
         }
 
-        function sendIceCandidate(candidate) {
+        // ✅ Função corrigida: busca array atual antes de chamar RPC
+        async function sendIceCandidate(candidate) {
             const field = isCaller ? 'ice_a' : 'ice_b';
-            supabase.from('rooms').update({
-                [field]: supabase.rpc('array_append', {
-                    array: supabase.raw(`COALESCE(${field}, '[]'::jsonb[])`),
-                    element: candidate.toJSON()
-                })
-            }).eq('id', currentRoomId);
+
+            try {
+                // 1. Busca o array atual do banco
+                const { data: room, error: fetchError } = await supabase
+                    .from('rooms')
+                    .select(field)
+                    .eq('id', currentRoomId)
+                    .single();
+
+                if (fetchError) throw fetchError;
+
+                const currentArray = room[field] || []; // Usa array existente ou vazio
+                const newCandidate = candidate.toJSON();
+
+                // 2. Chama a função RPC para adicionar
+                const { data: updatedArray, error: rpcError } = await supabase
+                    .rpc('append_jsonb_array', {
+                        arr: currentArray,
+                        elem: newCandidate
+                    });
+
+                if (rpcError) throw rpcError;
+
+                // 3. Atualiza o campo no banco
+                await supabase
+                    .from('rooms')
+                    .update({ [field]: updatedArray })
+                    .eq('id', currentRoomId);
+
+            } catch (error) {
+                console.error('Erro ao enviar ICE candidate:', error);
+            }
         }
 
         function listenForAnswer() {
@@ -641,31 +665,15 @@
             if (volumeInterval) clearInterval(volumeInterval);
             audioContext = new (window.AudioContext || window.webkitAudioContext)();
             const sourceLocal = audioContext.createMediaStreamSource(localStream);
-            analyserLocal = audioContext.createAnalyser();
+            const analyserLocal = audioContext.createAnalyser();
             analyserLocal.fftSize = 256;
             sourceLocal.connect(analyserLocal);
-
-            let analyserRemote = null;
-            if (remoteAudio.srcObject) {
-                const sourceRemote = audioContext.createMediaStreamSource(remoteAudio.srcObject);
-                analyserRemote = audioContext.createAnalyser();
-                analyserRemote.fftSize = 256;
-                sourceRemote.connect(analyserRemote);
-            }
-
-            const dataLocal = new Uint8Array(analyserLocal.frequencyBinCount);
-            const dataRemote = analyserRemote ? new Uint8Array(analyserRemote.frequencyBinCount) : null;
+            const dataArray = new Uint8Array(analyserLocal.frequencyBinCount);
 
             volumeInterval = setInterval(() => {
-                analyserLocal.getByteFrequencyData(dataLocal);
-                const avgLocal = dataLocal.reduce((a, b) => a + b) / dataLocal.length;
-                volumeLevelLocal.style.width = Math.min(avgLocal * 1.5, 100) + '%';
-
-                if (analyserRemote && remoteAudio.srcObject) {
-                    analyserRemote.getByteFrequencyData(dataRemote);
-                    const avgRemote = dataRemote.reduce((a, b) => a + b) / dataRemote.length;
-                    volumeLevelRemote.style.width = Math.min(avgRemote * 1.5, 100) + '%';
-                }
+                analyserLocal.getByteFrequencyData(dataArray);
+                const average = dataArray.reduce((a, b) => a + b) / dataArray.length;
+                volumeLevelLocal.style.width = Math.min(average * 1.5, 100) + '%';
             }, 100);
         }
 
