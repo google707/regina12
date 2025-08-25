@@ -117,6 +117,14 @@
             transform: translateY(-2px);
         }
         
+        .btn-success {
+            background-color: var(--success);
+        }
+        
+        .btn-success:hover {
+            background-color: #218838;
+        }
+        
         .btn-warning {
             background-color: var(--warning);
             color: var(--dark);
@@ -220,6 +228,39 @@
             color: var(--primary);
         }
         
+        .rooms-list {
+            margin: 1.5rem 0;
+            text-align: left;
+        }
+        
+        .room-item {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .room-host {
+            font-weight: 500;
+        }
+        
+        .join-btn {
+            background-color: var(--success);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+        
+        .join-btn:hover {
+            background-color: #218838;
+        }
+        
         footer {
             background-color: white;
             padding: 1.5rem;
@@ -319,17 +360,25 @@
                     <input type="text" id="nickname" placeholder="Como quer ser chamado?" maxlength="20">
                 </div>
                 
-                <button class="btn" id="btn-start">Iniciar Chamada</button>
+                <button class="btn" id="btn-start">Iniciar Chamada Aleatória</button>
+                <button class="btn btn-success" id="btn-create-room" style="margin-top: 1rem;">Criar Sala Pública</button>
+            </div>
+
+            <!-- Lista de salas públicas -->
+            <div class="card">
+                <h3>Salas Públicas Disponíveis</h3>
+                <p><small>Entre em uma sala para começar agora</small></p>
+                <div class="rooms-list" id="rooms-list">
+                    <p id="no-rooms">Nenhuma sala disponível no momento.</p>
+                </div>
             </div>
             
             <div class="card">
                 <h3>Como funciona</h3>
-                <p>1. Clique em "Iniciar Chamada"</p>
-                <p>2. Aguarde enquanto encontramos alguém para conversar</p>
+                <p>1. Clique em "Iniciar Chamada" ou "Criar Sala"</p>
+                <p>2. Aguarde ou entre em uma sala pública</p>
                 <p>3. Converse através de áudio</p>
                 <p>4. Clique em "Próximo" para conversar com outra pessoa</p>
-                
-                <p><small>Respeite os outros usuários. Comportamento inadequado resultará em banimento.</small></p>
             </div>
         </div>
         
@@ -410,6 +459,7 @@
         const stateSearching = document.getElementById('state-searching');
         const stateInCall = document.getElementById('state-in-call');
         const btnStart = document.getElementById('btn-start');
+        const btnCreateRoom = document.getElementById('btn-create-room');
         const btnCancelSearch = document.getElementById('btn-cancel-search');
         const btnNext = document.getElementById('btn-next');
         const btnEndCall = document.getElementById('btn-end-call');
@@ -418,6 +468,9 @@
         const volumeLevelLocal = document.getElementById('volume-level-local');
         const volumeLevelRemote = document.getElementById('volume-level-remote');
         const remoteAudio = document.getElementById('remote-audio');
+        const roomsList = document.getElementById('rooms-list');
+        const noRooms = document.getElementById('no-rooms');
+
         const privacyModal = document.getElementById('privacy-modal');
         const privacyPolicyLink = document.getElementById('privacy-policy');
         const termsOfUseLink = document.getElementById('terms-of-use');
@@ -433,6 +486,7 @@
         let volumeInterval = null;
         let audioContext = null;
         let searchTimeout = null;
+        let publicRoomId = null; // Se este usuário criou uma sala pública
 
         // Config WebRTC
         const rtcConfig = {
@@ -443,6 +497,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             userId = getOrCreateUserId();
             setupEventListeners();
+            setupPublicRoomsListener();
         });
 
         function getOrCreateUserId() {
@@ -456,6 +511,7 @@
 
         function setupEventListeners() {
             btnStart.addEventListener('click', startSearching);
+            btnCreateRoom.addEventListener('click', createPublicRoom);
             btnCancelSearch.addEventListener('click', cancelSearch);
             btnNext.addEventListener('click', nextPartner);
             btnEndCall.addEventListener('click', endCall);
@@ -485,7 +541,6 @@
             const nickname = nicknameInput.value.trim() || 'Anônimo';
             showState(stateSearching);
 
-            // Timeout
             searchTimeout = setTimeout(() => {
                 if (stateSearching.classList.contains('active')) {
                     cancelSearch();
@@ -493,57 +548,130 @@
                 }
             }, 30000);
 
-            // Entrar na fila
             await supabase.from('queue').insert([{ id: userId, nickname, created_at: new Date().toISOString() }]);
+            await findPartner(nickname);
+        }
 
-            // Tentar parear
-            let room = await checkAndPair();
-            if (room) {
-                handlePairing(room);
+        async function findPartner(nickname) {
+            const {  others } = await supabase.from('queue').select('id, nickname').neq('id', userId).limit(1);
+            if (others?.length) {
+                const partner = others[0];
+                await supabase.from('queue').delete().in('id', [userId, partner.id]);
+                await createRoomAndConnect(partner, nickname, partner.nickname);
                 return;
             }
 
-            // Escutar novos usuários
             supabase.channel('watch-queue')
-                .on('postgres_changes', {
-                    event: 'INSERT',
-                    schema: 'public',
-                    table: 'queue',
-                }, async (payload) => {
-                    if (payload.new.id !== userId) {
+                .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'queue' }, async (p) => {
+                    if (p.new.id !== userId) {
                         supabase.channel('watch-queue').unsubscribe();
                         clearTimeout(searchTimeout);
-                        await supabase.from('queue').delete().in('id', [userId, payload.new.id]);
-                        const {  newRoom } = await supabase.from('rooms').insert({
-                            user_a: userId,
-                            user_b: payload.new.id,
-                            offer_a: null,
-                            answer_b: null,
-                            ice_a: [],
-                            ice_b: []
-                        }).select().single();
-                        handlePairing(newRoom, payload.new.nickname);
+                        await supabase.from('queue').delete().in('id', [userId, p.new.id]);
+                        await createRoomAndConnect(p.new, nickname, p.new.nickname);
                     }
                 })
                 .subscribe();
         }
 
-        async function checkAndPair() {
-            const {  others } = await supabase.from('queue').select('id, nickname').neq('id', userId).limit(1);
-            if (others?.length) {
-                const partner = others[0];
-                await supabase.from('queue').delete().in('id', [userId, partner.id]);
-                return { partner, create: true };
-            }
-            return null;
+        async function createRoomAndConnect(partner, myNickname, partnerNickname) {
+            const {  room } = await supabase.from('rooms').insert({
+                user_a: userId,
+                user_b: partner.id,
+                offer_a: null,
+                answer_b: null,
+                ice_a: [],
+                ice_b: []
+            }).select().single();
+
+            currentRoomId = room.id;
+            partnerId = partner.id;
+            partnerName.textContent = partnerNickname;
+            isCaller = true;
+            await setupWebRTC(true, room);
+            showState(stateInCall);
+            startVolumeIndicator();
         }
 
-        async function handlePairing(room, partnerNickname = 'Alguém') {
-            currentRoomId = room.id;
-            partnerId = room.user_a === userId ? room.user_b : room.user_a;
-            partnerName.textContent = partnerNickname;
-            isCaller = room.user_a === userId;
-            await setupWebRTC(isCaller, room);
+        // ✅ Criar Sala Pública
+        async function createPublicRoom() {
+            const nickname = nicknameInput.value.trim() || 'Anônimo';
+            const {  room, error } = await supabase.from('public_rooms').insert([
+                { host_id: userId, host_nickname: nickname }
+            ]).select().single();
+
+            if (error) return alert('Erro ao criar sala.');
+
+            publicRoomId = room.id;
+            btnCreateRoom.disabled = true;
+            btnCreateRoom.textContent = 'Sala criada!';
+            setTimeout(() => showState(stateSearching), 1000);
+            await startSearching(); // Também entra na fila
+        }
+
+        // ✅ Escutar salas públicas
+        function setupPublicRoomsListener() {
+            supabase.channel('public-rooms')
+                .on('postgres_changes', {
+                    event: 'INSERT',
+                    schema: 'public',
+                    table: 'public_rooms'
+                }, async (payload) => {
+                    addRoomToList(payload.new);
+                })
+                .subscribe();
+
+            // Carregar salas existentes
+            loadPublicRooms();
+        }
+
+        async function loadPublicRooms() {
+            const {  rooms } = await supabase.from('public_rooms').select('*');
+            roomsList.innerHTML = '';
+            if (rooms?.length) {
+                noRooms.style.display = 'none';
+                rooms.forEach(addRoomToList);
+            } else {
+                noRooms.style.display = 'block';
+            }
+        }
+
+        function addRoomToList(room) {
+            if (room.host_id === userId) return; // Não mostrar sua própria sala
+
+            const item = document.createElement('div');
+            item.className = 'room-item';
+            item.innerHTML = `
+                <span class="room-host">${room.host_nickname}</span>
+                <button class="join-btn" data-id="${room.id}" data-nick="${room.host_nickname}">
+                    Entrar
+                </button>
+            `;
+            item.querySelector('.join-btn').addEventListener('click', () => joinPublicRoom(room));
+            roomsList.appendChild(item);
+            noRooms.style.display = 'none';
+        }
+
+        async function joinPublicRoom(room) {
+            const myNickname = nicknameInput.value.trim() || 'Anônimo';
+
+            // Deletar a sala pública (só um pode entrar)
+            await supabase.from('public_rooms').delete().eq('id', room.id);
+
+            // Criar sala privada
+            const {  newRoom } = await supabase.from('rooms').insert({
+                user_a: room.host_id,
+                user_b: userId,
+                offer_a: null,
+                answer_b: null,
+                ice_a: [],
+                ice_b: []
+            }).select().single();
+
+            currentRoomId = newRoom.id;
+            partnerId = room.host_id;
+            partnerName.textContent = room.host_nickname;
+            isCaller = false; // O anfitrião será o caller
+            await setupWebRTC(false, newRoom);
             showState(stateInCall);
             startVolumeIndicator();
         }
@@ -581,13 +709,11 @@
             }
         }
 
-        // ✅ Função corrigida: busca array atual antes de chamar RPC
         async function sendIceCandidate(candidate) {
             const field = isCaller ? 'ice_a' : 'ice_b';
 
             try {
-                // 1. Busca o array atual do banco
-                const { data: room, error: fetchError } = await supabase
+                const {  room, error: fetchError } = await supabase
                     .from('rooms')
                     .select(field)
                     .eq('id', currentRoomId)
@@ -595,37 +721,23 @@
 
                 if (fetchError) throw fetchError;
 
-                const currentArray = room[field] || []; // Usa array existente ou vazio
+                const currentArray = room[field] || [];
                 const newCandidate = candidate.toJSON();
 
-                // 2. Chama a função RPC para adicionar
-                const { data: updatedArray, error: rpcError } = await supabase
-                    .rpc('append_jsonb_array', {
-                        arr: currentArray,
-                        elem: newCandidate
-                    });
+                const {  updatedArray, error: rpcError } = await supabase
+                    .rpc('append_jsonb_array', { arr: currentArray, elem: newCandidate });
 
                 if (rpcError) throw rpcError;
 
-                // 3. Atualiza o campo no banco
-                await supabase
-                    .from('rooms')
-                    .update({ [field]: updatedArray })
-                    .eq('id', currentRoomId);
-
+                await supabase.from('rooms').update({ [field]: updatedArray }).eq('id', currentRoomId);
             } catch (error) {
-                console.error('Erro ao enviar ICE candidate:', error);
+                console.error('Erro ao enviar ICE:', error);
             }
         }
 
         function listenForAnswer() {
             supabase.channel(`answer-${currentRoomId}`)
-                .on('postgres_changes', {
-                    event: 'UPDATE',
-                    schema: 'public',
-                    table: 'rooms',
-                    filter: `id=eq.${currentRoomId}`
-                }, async (p) => {
+                .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'rooms', filter: `id=eq.${currentRoomId}` }, async (p) => {
                     const ans = p.new.answer_b;
                     if (ans && !peerConnection.currentRemoteDescription) {
                         await peerConnection.setRemoteDescription(new RTCSessionDescription(ans));
@@ -637,17 +749,10 @@
         function listenForIceCandidates() {
             const field = isCaller ? 'ice_b' : 'ice_a';
             supabase.channel(`ice-${currentRoomId}`)
-                .on('postgres_changes', {
-                    event: 'UPDATE',
-                    schema: 'public',
-                    table: 'rooms',
-                    filter: `id=eq.${currentRoomId}`
-                }, async (p) => {
+                .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'rooms', filter: `id=eq.${currentRoomId}` }, async (p) => {
                     const newCands = p.new[field] || [];
                     const oldCands = p.old[field] || [];
-                    const added = newCands.filter(nc => !oldCands.some(oc => 
-                        oc.candidate === nc.candidate
-                    ));
+                    const added = newCands.filter(nc => !oldCands.some(oc => oc.candidate === nc.candidate));
                     added.forEach(async (c) => {
                         try {
                             if (peerConnection.remoteDescription) {
@@ -664,22 +769,28 @@
         function startVolumeIndicator() {
             if (volumeInterval) clearInterval(volumeInterval);
             audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            const sourceLocal = audioContext.createMediaStreamSource(localStream);
-            const analyserLocal = audioContext.createAnalyser();
-            analyserLocal.fftSize = 256;
-            sourceLocal.connect(analyserLocal);
-            const dataArray = new Uint8Array(analyserLocal.frequencyBinCount);
+            const source = audioContext.createMediaStreamSource(localStream);
+            const analyser = audioContext.createAnalyser();
+            analyser.fftSize = 256;
+            source.connect(analyser);
+            const dataArray = new Uint8Array(analyser.frequencyBinCount);
 
             volumeInterval = setInterval(() => {
-                analyserLocal.getByteFrequencyData(dataArray);
-                const average = dataArray.reduce((a, b) => a + b) / dataArray.length;
-                volumeLevelLocal.style.width = Math.min(average * 1.5, 100) + '%';
+                analyser.getByteFrequencyData(dataArray);
+                const avg = dataArray.reduce((a, b) => a + b) / dataArray.length;
+                volumeLevelLocal.style.width = Math.min(avg * 1.5, 100) + '%';
             }, 100);
         }
 
         function cancelSearch() {
             if (searchTimeout) clearTimeout(searchTimeout);
             supabase.from('queue').delete().eq('id', userId);
+            if (publicRoomId) {
+                supabase.from('public_rooms').delete().eq('id', publicRoomId);
+                publicRoomId = null;
+                btnCreateRoom.disabled = false;
+                btnCreateRoom.textContent = 'Criar Sala Pública';
+            }
             showState(stateHome);
         }
 
