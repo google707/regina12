@@ -1,256 +1,695 @@
 <!DOCTYPE html>
 <html lang="pt">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Moz P2P - Plataforma de Pagamentos</title>
-  <meta name="description" content="Plataforma P2P para transações rápidas e seguras">
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      background-color: #0b0e11;
-      font-family: 'Segoe UI', Roboto, sans-serif;
-      color: #eaecef;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      text-align: center;
-      line-height: 1.6;
-    }
-
-    .container {
-      max-width: 600px;
-      width: 90%;
-      padding: 40px 20px;
-      background-color: #181a20;
-      border-radius: 16px;
-      box-shadow: 0 0 20px rgba(252, 213, 53, 0.1);
-      margin: 20px;
-      position: relative;
-    }
-
-    .notice {
-      background-color: #fcd535;
-      color: #181a20;
-      padding: 10px;
-      border-radius: 8px;
-      margin-bottom: 20px;
-      font-size: 0.9rem;
-      font-weight: bold;
-    }
-
-    h1 {
-      font-size: 2.2rem;
-      color: #fcd535;
-      margin-bottom: 15px;
-    }
-
-    p {
-      font-size: 1.1rem;
-      color: #a1a7bb;
-      margin-bottom: 30px;
-    }
-
-    .btn {
-      background-color: #fcd535;
-      color: #181a20;
-      font-weight: bold;
-      font-size: 1rem;
-      padding: 12px 24px;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      text-decoration: none;
-      display: inline-block;
-    }
-
-    .btn:hover {
-      background-color: #e5c100;
-      transform: translateY(-2px);
-      box-shadow: 0 5px 15px rgba(252, 213, 53, 0.3);
-    }
-
-    /* Modal styles */
-    .modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0, 0, 0, 0.7);
-      z-index: 1000;
-      justify-content: center;
-      align-items: center;
-    }
-
-    .modal-content {
-      background-color: #181a20;
-      padding: 30px;
-      border-radius: 16px;
-      width: 90%;
-      max-width: 400px;
-      box-shadow: 0 0 25px rgba(252, 213, 53, 0.2);
-    }
-
-    .modal h2 {
-      color: #fcd535;
-      margin-top: 0;
-    }
-
-    .input-group {
-      margin-bottom: 20px;
-      text-align: left;
-    }
-
-    .input-group label {
-      display: block;
-      margin-bottom: 8px;
-      color: #a1a7bb;
-    }
-
-    .input-group input {
-      width: 100%;
-      padding: 12px;
-      border-radius: 8px;
-      border: 1px solid #2b3139;
-      background-color: #0b0e11;
-      color: #eaecef;
-      font-size: 1rem;
-    }
-
-    .modal-buttons {
-      display: flex;
-      gap: 10px;
-      justify-content: flex-end;
-    }
-
-    .btn-secondary {
-      background-color: #2b3139;
-      color: #eaecef;
-    }
-
-    .btn-secondary:hover {
-      background-color: #3a424b;
-    }
-
-    .error-message {
-      color: #ff6b6b;
-      margin-top: 5px;
-      font-size: 0.9rem;
-      display: none;
-    }
-
-    @media (max-width: 480px) {
-      h1 {
-        font-size: 1.8rem;
-      }
-      
-      p {
-        font-size: 1rem;
-      }
-      
-      .modal-content {
-        padding: 20px;
-      }
-      
-      .notice {
-        font-size: 0.8rem;
-      }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MozVoice - Chamadas de Áudio Aleatórias</title>
+    <!-- ✅ Corrigido: URL correta e versão específica -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.2"></script>
+    <style>
+        :root {
+            --primary: #2c5aa0;
+            --secondary: #00843d;
+            --accent: #ce1126;
+            --light: #f8f9fa;
+            --dark: #343a40;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f0f2f5;
+            color: var(--dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .logo-icon {
+            font-size: 2rem;
+        }
+        
+        main {
+            flex: 1;
+            padding: 2rem 1rem;
+            max-width: 600px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        
+        h1, h2, h3 {
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+        
+        p {
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        
+        input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        
+        .btn:hover {
+            background-color: #1e4080;
+            transform: translateY(-2px);
+        }
+        
+        .btn-warning {
+            background-color: var(--warning);
+            color: var(--dark);
+        }
+        
+        .btn-warning:hover {
+            background-color: #e0a800;
+        }
+        
+        .btn-danger {
+            background-color: var(--danger);
+        }
+        
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+        
+        .btn:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .state {
+            display: none;
+        }
+        
+        .active {
+            display: block;
+        }
+        
+        .searching-animation {
+            display: flex;
+            justify-content: center;
+            margin: 2rem 0;
+        }
+        
+        .dot {
+            width: 12px;
+            height: 12px;
+            background-color: var(--primary);
+            border-radius: 50%;
+            margin: 0 5px;
+            animation: bounce 1.5s infinite;
+        }
+        
+        .dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        
+        .dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-15px);
+            }
+        }
+        
+        .call-controls {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        
+        .volume-indicator {
+            width: 100%;
+            height: 30px;
+            background: #eee;
+            border-radius: 15px;
+            margin: 1.5rem 0;
+            overflow: hidden;
+        }
+        
+        .volume-level {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--secondary), var(--success));
+            border-radius: 15px;
+            transition: width 0.3s ease;
+        }
+        
+        .audio-container {
+            margin: 1.5rem 0;
+        }
+        
+        .audio-wrapper {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 1rem;
+        }
+        
+        .audio-label {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            color: var(--primary);
+        }
+        
+        footer {
+            background-color: white;
+            padding: 1.5rem;
+            text-align: center;
+            border-top: 1px solid #eee;
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+        
+        .privacy-link {
+            color: var(--primary);
+            text-decoration: none;
+        }
+        
+        .privacy-link:hover {
+            text-decoration: underline;
+        }
+        
+        .flag {
+            display: inline-block;
+            margin: 0 5px;
+            font-size: 1.2rem;
+        }
+        
+        .privacy-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 12px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .modal-close {
+            float: right;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
+        @media (max-width: 768px) {
+            main {
+                padding: 1rem;
+            }
+            
+            .card {
+                padding: 1.5rem;
+            }
+            
+            .call-controls {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+            
+            .audio-wrapper {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <div class="notice">
-      ATENÇÃO: Atualmente só processamos depósitos para Binance devido a atualizações no sistema.
+    <header>
+        <div class="logo">
+            <span class="logo-icon">🎧</span>
+            <h1>MozVoice</h1>
+        </div>
+        <p>Conecte-se com pessoas de Moçambique <span class="flag">🇲🇿</span></p>
+    </header>
+    
+    <main>
+        <!-- Estado inicial -->
+        <div class="state active" id="state-home">
+            <div class="card">
+                <h2>Iniciar Chamada Aleatória</h2>
+                <p>Converse com pessoas aleatórias de Moçambique através de chamadas de áudio. É rápido, fácil e não requer cadastro.</p>
+                
+                <div class="form-group">
+                    <label for="nickname">Apelido (opcional):</label>
+                    <input type="text" id="nickname" placeholder="Como quer ser chamado?" maxlength="20">
+                </div>
+                
+                <button class="btn" id="btn-start">Iniciar Chamada</button>
+            </div>
+            
+            <div class="card">
+                <h3>Como funciona</h3>
+                <p>1. Clique em "Iniciar Chamada"</p>
+                <p>2. Aguarde enquanto encontramos alguém para conversar</p>
+                <p>3. Converse através de áudio</p>
+                <p>4. Clique em "Próximo" para conversar com outra pessoa</p>
+                
+                <p><small>Respeite os outros usuários. Comportamento inadequado resultará em banimento.</small></p>
+            </div>
+        </div>
+        
+        <!-- Estado procurando -->
+        <div class="state" id="state-searching">
+            <div class="card">
+                <h2>Procurando parceiro...</h2>
+                <p>Estamos buscando alguém para conectar com você. Isso pode levar alguns instantes.</p>
+                
+                <div class="searching-animation">
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                </div>
+                
+                <button class="btn btn-danger" id="btn-cancel-search">Cancelar</button>
+            </div>
+        </div>
+        
+        <!-- Estado em chamada -->
+        <div class="state" id="state-in-call">
+            <div class="card">
+                <h2>Em chamada</h2>
+                <p>Conectado com: <span id="partner-name">Alguém</span></p>
+                
+                <div class="audio-container">
+                    <div class="audio-wrapper">
+                        <div>
+                            <div class="audio-label">Seu áudio:</div>
+                            <div class="volume-indicator">
+                                <div class="volume-level" id="volume-level-local"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="audio-label">Áudio remoto:</div>
+                            <div class="volume-indicator">
+                                <div class="volume-level" id="volume-level-remote"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <audio id="remote-audio" autoplay></audio>
+                
+                <div class="call-controls">
+                    <button class="btn btn-warning" id="btn-next">Próximo</button>
+                    <button class="btn btn-danger" id="btn-end-call">Sair</button>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <footer>
+        <p>⚠️ Não compartilhe informações pessoais durante as chamadas</p>
+        <p><a href="#" class="privacy-link" id="privacy-policy">Política de Privacidade</a> | <a href="#" class="privacy-link" id="terms-of-use">Termos de Uso</a></p>
+        <p>© 2025 MozVoice - Conexões que importam</p>
+    </footer>
+
+    <!-- Modal de Privacidade -->
+    <div class="privacy-modal" id="privacy-modal">
+        <div class="modal-content">
+            <span class="modal-close" id="modal-close">&times;</span>
+            <h2>Política de Privacidade</h2>
+            <p>O MozVoice respeita sua privacidade. Todas as chamadas são anônimas e não armazenamos o conteúdo das conversas. Coletamos apenas informações necessárias para o funcionamento do serviço.</p>
+            <p>Seus dados pessoais não são compartilhados com terceiros. Ao usar nosso serviço, você concorda com nossos termos de uso.</p>
+        </div>
     </div>
-    <h1>Moz P2P</h1>
-    <p>Bem-vindo à plataforma Moz P2P, onde você pode realizar transações de forma rápida, segura e confiável.</p>
-    <a href="#" class="btn" id="startBtn">Começar Agora</a>
-  </div>
 
-  <!-- Modal for agent code -->
-  <div class="modal" id="agentModal">
-    <div class="modal-content">
-      <h2>Informações de Acesso</h2>
-      <div class="input-group">
-        <label for="username">Seu Nome de Usuário</label>
-        <input type="text" id="username" placeholder="Digite seu nome de usuário">
-      </div>
-      <div class="input-group">
-        <label for="agentCode">Código do Agente</label>
-        <input type="text" id="agentCode" placeholder="Digite o código do agente">
-        <div class="error-message" id="errorMessage">Código inválido. Por favor, verifique e tente novamente.</div>
-      </div>
-      <div class="modal-buttons">
-        <button class="btn btn-secondary" id="cancelBtn">Cancelar</button>
-        <button class="btn" id="confirmBtn">Confirmar</button>
-      </div>
-    </div>
-  </div>
+    <script>
+        // ✅ CREDENCIAIS DO SUPABASE
+        const SUPABASE_URL = 'https://lsgbijmmxredmqxyxnsp.supabase.co'; // ✅ Sem espaços
+        const SUPABASE_ANON_KEY = 'sb_publishable_bD8yP5WqAe1TCO5WXcRWgg_-GfCfcNt'; // ✅ Chave pública (funciona)
 
-  <script>
-    // Get modal elements
-    const modal = document.getElementById('agentModal');
-    const startBtn = document.getElementById('startBtn');
-    const cancelBtn = document.getElementById('cancelBtn');
-    const confirmBtn = document.getElementById('confirmBtn');
-    const usernameInput = document.getElementById('username');
-    const agentCodeInput = document.getElementById('agentCode');
-    const errorMessage = document.getElementById('errorMessage');
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // Open modal when start button is clicked
-    startBtn.addEventListener('click', function(e) {
-      e.preventDefault();
-      modal.style.display = 'flex';
-      usernameInput.value = '';
-      agentCodeInput.value = '';
-      errorMessage.style.display = 'none';
-    });
+        // Elementos
+        const stateHome = document.getElementById('state-home');
+        const stateSearching = document.getElementById('state-searching');
+        const stateInCall = document.getElementById('state-in-call');
+        const btnStart = document.getElementById('btn-start');
+        const btnCancelSearch = document.getElementById('btn-cancel-search');
+        const btnNext = document.getElementById('btn-next');
+        const btnEndCall = document.getElementById('btn-end-call');
+        const nicknameInput = document.getElementById('nickname');
+        const partnerName = document.getElementById('partner-name');
+        const volumeLevelLocal = document.getElementById('volume-level-local');
+        const volumeLevelRemote = document.getElementById('volume-level-remote');
+        const remoteAudio = document.getElementById('remote-audio');
+        const privacyModal = document.getElementById('privacy-modal');
+        const privacyPolicyLink = document.getElementById('privacy-policy');
+        const termsOfUseLink = document.getElementById('terms-of-use');
+        const modalClose = document.getElementById('modal-close');
 
-    // Close modal when cancel button is clicked
-    cancelBtn.addEventListener('click', function() {
-      modal.style.display = 'none';
-    });
+        // Estado
+        let userId = null;
+        let currentRoomId = null;
+        let partnerId = null;
+        let localStream = null;
+        let peerConnection = null;
+        let isCaller = false;
+        let volumeInterval = null;
+        let audioContext = null;
+        let analyserLocal = null;
+        let analyserRemote = null;
+        let searchTimeout = null;
 
-    // Handle confirm button click
-    confirmBtn.addEventListener('click', function() {
-      const username = usernameInput.value.trim();
-      const agentCode = agentCodeInput.value.trim();
-      
-      if (!username) {
-        alert('Por favor, insira seu nome de usuário');
-        usernameInput.focus();
-        return;
-      }
-      
-      if (agentCode === '79401moz') {
-        // Correct code - redirect to payment page with username as parameter
-        window.location.href = `https://payment-bay-theta.vercel.app?username=${encodeURIComponent(username)}`;
-      } else {
-        // Incorrect code - show error
-        errorMessage.style.display = 'block';
-        agentCodeInput.focus();
-      }
-    });
+        // Config WebRTC
+        const rtcConfig = {
+            iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
+        };
 
-    // Close modal when clicking outside the modal content
-    window.addEventListener('click', function(e) {
-      if (e.target === modal) {
-        modal.style.display = 'none';
-      }
-    });
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', () => {
+            userId = getOrCreateUserId();
+            setupEventListeners();
+        });
 
-    // Allow submitting with Enter key
-    agentCodeInput.addEventListener('keypress', function(e) {
-      if (e.key === 'Enter') {
-        confirmBtn.click();
-      }
-    });
-  </script>
+        function getOrCreateUserId() {
+            let id = localStorage.getItem('mozvoice_user_id');
+            if (!id) {
+                id = 'user_' + Math.random().toString(36).substr(2, 9);
+                localStorage.setItem('mozvoice_user_id', id);
+            }
+            return id;
+        }
+
+        function setupEventListeners() {
+            btnStart.addEventListener('click', startSearching);
+            btnCancelSearch.addEventListener('click', cancelSearch);
+            btnNext.addEventListener('click', nextPartner);
+            btnEndCall.addEventListener('click', endCall);
+            privacyPolicyLink.addEventListener('click', showPrivacyModal);
+            termsOfUseLink.addEventListener('click', showPrivacyModal);
+            modalClose.addEventListener('click', hidePrivacyModal);
+            window.addEventListener('click', (e) => {
+                if (e.target === privacyModal) hidePrivacyModal();
+            });
+        }
+
+        function showPrivacyModal(e) {
+            e.preventDefault();
+            privacyModal.style.display = 'flex';
+        }
+
+        function hidePrivacyModal() {
+            privacyModal.style.display = 'none';
+        }
+
+        function showState(el) {
+            [stateHome, stateSearching, stateInCall].forEach(s => s.classList.remove('active'));
+            el.classList.add('active');
+        }
+
+        async function startSearching() {
+            const nickname = nicknameInput.value.trim() || 'Anônimo';
+            showState(stateSearching);
+
+            // Timeout
+            searchTimeout = setTimeout(() => {
+                if (stateSearching.classList.contains('active')) {
+                    cancelSearch();
+                    alert('Não foi possível encontrar um parceiro.');
+                }
+            }, 30000);
+
+            // Entrar na fila
+            await supabase.from('queue').insert([{ id: userId, nickname, created_at: new Date().toISOString() }]);
+
+            // Tentar parear
+            let room = await checkAndPair();
+            if (room) {
+                handlePairing(room);
+                return;
+            }
+
+            // Escutar novos usuários
+            supabase.channel('watch-queue')
+                .on('postgres_changes', {
+                    event: 'INSERT',
+                    schema: 'public',
+                    table: 'queue',
+                }, async (payload) => {
+                    if (payload.new.id !== userId) {
+                        supabase.channel('watch-queue').unsubscribe();
+                        clearTimeout(searchTimeout);
+                        await supabase.from('queue').delete().in('id', [userId, payload.new.id]);
+                        const {  newRoom } = await supabase.from('rooms').insert({
+                            user_a: userId,
+                            user_b: payload.new.id,
+                            offer_a: null,
+                            answer_b: null,
+                            ice_a: [],
+                            ice_b: []
+                        }).select().single();
+                        handlePairing(newRoom, payload.new.nickname);
+                    }
+                })
+                .subscribe();
+        }
+
+        async function checkAndPair() {
+            const {  others } = await supabase.from('queue').select('id, nickname').neq('id', userId).limit(1);
+            if (others?.length) {
+                const partner = others[0];
+                await supabase.from('queue').delete().in('id', [userId, partner.id]);
+                return { partner, create: true };
+            }
+            return null;
+        }
+
+        async function handlePairing(room, partnerNickname = 'Alguém') {
+            currentRoomId = room.id;
+            partnerId = room.user_a === userId ? room.user_b : room.user_a;
+            partnerName.textContent = partnerNickname;
+            isCaller = room.user_a === userId;
+            await setupWebRTC(isCaller, room);
+            showState(stateInCall);
+            startVolumeIndicator();
+        }
+
+        async function setupWebRTC(isInitiator, room) {
+            try {
+                localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                peerConnection = new RTCPeerConnection(rtcConfig);
+                localStream.getTracks().forEach(t => peerConnection.addTrack(t, localStream));
+
+                peerConnection.ontrack = (e) => {
+                    remoteAudio.srcObject = e.streams[0];
+                    remoteAudio.play().catch(e => console.warn("Auto-play bloqueado:", e));
+                };
+
+                peerConnection.onicecandidate = (e) => e.candidate && sendIceCandidate(e.candidate);
+
+                if (isInitiator) {
+                    const offer = await peerConnection.createOffer();
+                    await peerConnection.setLocalDescription(offer);
+                    await supabase.from('rooms').update({ offer_a: offer }).eq('id', currentRoomId);
+                    listenForAnswer();
+                } else {
+                    if (room.offer_a) {
+                        await peerConnection.setRemoteDescription(new RTCSessionDescription(room.offer_a));
+                        const answer = await peerConnection.createAnswer();
+                        await peerConnection.setLocalDescription(answer);
+                        await supabase.from('rooms').update({ answer_b: answer }).eq('id', currentRoomId);
+                    }
+                }
+                listenForIceCandidates();
+            } catch (e) {
+                console.error('WebRTC error:', e);
+                endCall();
+            }
+        }
+
+        function sendIceCandidate(candidate) {
+            const field = isCaller ? 'ice_a' : 'ice_b';
+            supabase.from('rooms').update({
+                [field]: supabase.rpc('array_append', {
+                    array: supabase.raw(`COALESCE(${field}, '[]'::jsonb[])`),
+                    element: candidate.toJSON()
+                })
+            }).eq('id', currentRoomId);
+        }
+
+        function listenForAnswer() {
+            supabase.channel(`answer-${currentRoomId}`)
+                .on('postgres_changes', {
+                    event: 'UPDATE',
+                    schema: 'public',
+                    table: 'rooms',
+                    filter: `id=eq.${currentRoomId}`
+                }, async (p) => {
+                    const ans = p.new.answer_b;
+                    if (ans && !peerConnection.currentRemoteDescription) {
+                        await peerConnection.setRemoteDescription(new RTCSessionDescription(ans));
+                    }
+                })
+                .subscribe();
+        }
+
+        function listenForIceCandidates() {
+            const field = isCaller ? 'ice_b' : 'ice_a';
+            supabase.channel(`ice-${currentRoomId}`)
+                .on('postgres_changes', {
+                    event: 'UPDATE',
+                    schema: 'public',
+                    table: 'rooms',
+                    filter: `id=eq.${currentRoomId}`
+                }, async (p) => {
+                    const newCands = p.new[field] || [];
+                    const oldCands = p.old[field] || [];
+                    const added = newCands.filter(nc => !oldCands.some(oc => 
+                        oc.candidate === nc.candidate
+                    ));
+                    added.forEach(async (c) => {
+                        try {
+                            if (peerConnection.remoteDescription) {
+                                await peerConnection.addIceCandidate(new RTCIceCandidate(c));
+                            }
+                        } catch (e) {
+                            console.error('Add ICE error:', e);
+                        }
+                    });
+                })
+                .subscribe();
+        }
+
+        function startVolumeIndicator() {
+            if (volumeInterval) clearInterval(volumeInterval);
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const sourceLocal = audioContext.createMediaStreamSource(localStream);
+            analyserLocal = audioContext.createAnalyser();
+            analyserLocal.fftSize = 256;
+            sourceLocal.connect(analyserLocal);
+
+            let analyserRemote = null;
+            if (remoteAudio.srcObject) {
+                const sourceRemote = audioContext.createMediaStreamSource(remoteAudio.srcObject);
+                analyserRemote = audioContext.createAnalyser();
+                analyserRemote.fftSize = 256;
+                sourceRemote.connect(analyserRemote);
+            }
+
+            const dataLocal = new Uint8Array(analyserLocal.frequencyBinCount);
+            const dataRemote = analyserRemote ? new Uint8Array(analyserRemote.frequencyBinCount) : null;
+
+            volumeInterval = setInterval(() => {
+                analyserLocal.getByteFrequencyData(dataLocal);
+                const avgLocal = dataLocal.reduce((a, b) => a + b) / dataLocal.length;
+                volumeLevelLocal.style.width = Math.min(avgLocal * 1.5, 100) + '%';
+
+                if (analyserRemote && remoteAudio.srcObject) {
+                    analyserRemote.getByteFrequencyData(dataRemote);
+                    const avgRemote = dataRemote.reduce((a, b) => a + b) / dataRemote.length;
+                    volumeLevelRemote.style.width = Math.min(avgRemote * 1.5, 100) + '%';
+                }
+            }, 100);
+        }
+
+        function cancelSearch() {
+            if (searchTimeout) clearTimeout(searchTimeout);
+            supabase.from('queue').delete().eq('id', userId);
+            showState(stateHome);
+        }
+
+        function nextPartner() {
+            endCall();
+            setTimeout(startSearching, 600);
+        }
+
+        async function endCall() {
+            if (volumeInterval) clearInterval(volumeInterval);
+            if (audioContext) await audioContext.close();
+            if (localStream) localStream.getTracks().forEach(t => t.stop());
+            if (peerConnection) peerConnection.close();
+            if (currentRoomId) await supabase.from('rooms').delete().eq('id', currentRoomId);
+            await supabase.from('queue').delete().eq('id', userId);
+            if (searchTimeout) clearTimeout(searchTimeout);
+            showState(stateHome);
+        }
+    </script>
 </body>
 </html>
