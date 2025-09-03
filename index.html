@@ -1,1153 +1,538 @@
 <!DOCTYPE html>
-<html lang="pt">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MozVoice - Chamadas de Áudio Aleatórias</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.2"></script>
+    <title>Moz P2P - Plataforma de pagamentos P2P</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --primary: #2c5aa0;
-            --secondary: #00843d;
-            --accent: #ce1126;
-            --light: #f8f9fa;
-            --dark: #343a40;
-            --success: #28a745;
-            --warning: #ffc107;
-            --danger: #dc3545;
+            --azul-escuro: #1e3a8a;
+            --azul-claro: #3b82f6;
+            --azul-vibrante: #2563eb;
+            --branco: #f8fafc;
+            --branco-suave: #f1f5f9;
+            --cinza-claro: #e5e7eb;
+            --gradiente-azul: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            --gradiente-vibrante: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            --gradiente-separador: linear-gradient(to bottom, #3b82f6, #f1f5f9);
+            --sombra: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 5px 10px -5px rgba(0, 0, 0, 0.04);
+            --sombra-destaque: 0 20px 40px -10px rgba(37, 99, 235, 0.3);
+            --transicao: all 0.3s ease;
         }
-        
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        
+
         body {
-            background-color: #f0f2f5;
-            color: var(--dark);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
+            font-family: 'Poppins', sans-serif;
+            color: var(--azul-escuro);
+            line-height: 1.6;
+            background-color: var(--branco-suave);
+            overflow-x: hidden;
         }
-        
-        header {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
-            padding: 1rem;
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        /* Header simplificado */
+        .header {
+            padding: 1.5rem 0;
+            background-color: var(--branco-suave);
+            position: relative;
             text-align: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
-        
+
         .logo {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-weight: 700;
+            font-size: 1.8rem;
+            color: var(--azul-escuro);
+            text-decoration: none;
+            transition: var(--transicao);
+        }
+
+        .logo:hover {
+            transform: scale(1.03);
+        }
+
+        .logo-img {
+            width: 50px;
+            height: 50px;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 0.5rem;
-            margin-bottom: 0.5rem;
-            flex-direction: column;
-        }
-        
-        .logo-icon {
-            font-size: 2.5rem;
-            margin-bottom: 0.5rem;
-        }
-        
-        main {
-            flex: 1;
-            padding: 2rem 1rem;
-            max-width: 600px;
-            margin: 0 auto;
-            width: 100%;
-        }
-        
-        .card {
-            background: white;
+            background: var(--gradiente-vibrante);
+            color: var(--branco);
             border-radius: 12px;
-            padding: 2rem;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-            margin-bottom: 1.5rem;
+            transition: var(--transicao);
+        }
+
+        .logo:hover .logo-img {
+            transform: rotate(5deg);
+        }
+
+        /* Hero Section com degradê de separação */
+        .hero {
+            background: var(--gradiente-azul);
+            color: var(--branco);
+            padding: 6rem 0 5rem;
             text-align: center;
-        }
-        
-        h1, h2, h3 {
-            margin-bottom: 1rem;
-            color: var(--primary);
-        }
-        
-        p {
-            margin-bottom: 1.5rem;
-            line-height: 1.6;
-        }
-        
-        .form-group {
-            margin-bottom: 1.5rem;
-            text-align: left;
-        }
-        
-        label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 500;
-        }
-        
-        input {
-            width: 100%;
-            padding: 0.75rem;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            font-size: 1rem;
-        }
-        
-        .btn {
-            display: inline-block;
-            padding: 0.75rem 1.5rem;
-            background-color: var(--primary);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-align: center;
-        }
-        
-        .btn:hover {
-            background-color: #1e4080;
-            transform: translateY(-2px);
-        }
-        
-        .btn-success {
-            background-color: var(--success);
-        }
-        
-        .btn-success:hover {
-            background-color: #218838;
-        }
-        
-        .btn-warning {
-            background-color: var(--warning);
-            color: var(--dark);
-        }
-        
-        .btn-warning:hover {
-            background-color: #e0a800;
-        }
-        
-        .btn-danger {
-            background-color: var(--danger);
-        }
-        
-        .btn-danger:hover {
-            background-color: #c82333;
-        }
-        
-        .btn:disabled {
-            background-color: #6c757d;
-            cursor: not-allowed;
-            transform: none;
-        }
-        
-        .state {
-            display: none;
-        }
-        
-        .active {
-            display: block;
-        }
-        
-        .searching-animation {
-            display: flex;
-            justify-content: center;
-            margin: 2rem 0;
-        }
-        
-        .dot {
-            width: 12px;
-            height: 12px;
-            background-color: var(--primary);
-            border-radius: 50%;
-            margin: 0 5px;
-            animation: bounce 1.5s infinite;
-        }
-        
-        .dot:nth-child(2) {
-            animation-delay: 0.2s;
-        }
-        
-        .dot:nth-child(3) {
-            animation-delay: 0.4s;
-        }
-        
-        @keyframes bounce {
-            0%, 100% {
-                transform: translateY(0);
-            }
-            50% {
-                transform: translateY(-15px);
-            }
-        }
-        
-        .call-controls {
-            display: flex;
-            justify-content: center;
-            gap: 1rem;
-            margin-top: 2rem;
-        }
-        
-        .volume-indicator {
-            width: 100%;
-            height: 30px;
-            background: #eee;
-            border-radius: 15px;
-            margin: 1.5rem 0;
+            position: relative;
             overflow: hidden;
         }
-        
-        .volume-level {
-            height: 100%;
-            width: 0%;
-            background: linear-gradient(90deg, var(--secondary), var(--success));
-            border-radius: 15px;
-            transition: width 0.3s ease;
+
+        .hero:before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+            transform: rotate(15deg);
         }
-        
-        .audio-container {
-            margin: 1.5rem 0;
+
+        .hero-content {
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 2;
         }
-        
-        .audio-wrapper {
-            display: flex;
-            justify-content: space-around;
-            margin-top: 1rem;
+
+        .hero-title {
+            font-size: 3.2rem;
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            animation: fadeInUp 0.8s ease-out;
         }
-        
-        .audio-label {
-            font-weight: bold;
-            margin-bottom: 0.5rem;
-            color: var(--primary);
+
+        .hero-subtitle {
+            font-size: 1.3rem;
+            margin-bottom: 2.5rem;
+            opacity: 0.9;
+            animation: fadeInUp 0.8s ease-out 0.2s both;
         }
-        
-        .rooms-list {
-            margin: 1.5rem 0;
-            text-align: left;
-        }
-        
-        .room-item {
-            background: #f8f9fa;
-            padding: 1rem;
-            border-radius: 8px;
-            margin-bottom: 0.5rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .room-host {
-            font-weight: 500;
-        }
-        
-        .join-btn {
-            background-color: var(--success);
-            color: white;
-            border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 6px;
-            font-size: 0.9rem;
-            cursor: pointer;
-        }
-        
-        .join-btn:hover {
-            background-color: #218838;
-        }
-        
-        footer {
-            background-color: white;
-            padding: 1.5rem;
-            text-align: center;
-            border-top: 1px solid #eee;
-            font-size: 0.9rem;
-            color: #6c757d;
-        }
-        
-        .privacy-link {
-            color: var(--primary);
-            text-decoration: none;
-        }
-        
-        .privacy-link:hover {
-            text-decoration: underline;
-        }
-        
-        .flag {
+
+        .btn {
             display: inline-block;
-            margin: 0 5px;
-            font-size: 1.2rem;
+            padding: 1.1rem 2.8rem;
+            background: var(--branco-suave);
+            color: var(--azul-escuro);
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            transition: var(--transicao);
+            box-shadow: var(--sombra);
+            position: relative;
+            overflow: hidden;
+            animation: fadeInUp 0.8s ease-out 0.4s both;
         }
-        
-        .privacy-modal {
-            display: none;
-            position: fixed;
+
+        .btn:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            transition: 0.5s;
+        }
+
+        .btn:hover {
+            transform: translateY(-5px) scale(1.03);
+            box-shadow: var(--sombra-destaque);
+        }
+
+        .btn:hover:before {
+            left: 100%;
+        }
+
+        /* Separador com degradê */
+        .separador {
+            height: 150px;
+            background: var(--gradiente-separador);
+            width: 100%;
+        }
+
+        /* Como Funcuja */
+        .how-it-works {
+            padding: 6rem 0;
+            background-color: var(--branco-suave);
+            position: relative;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.7rem;
+            font-weight: 800;
+            margin-bottom: 4rem;
+            color: var(--azul-escuro);
+            position: relative;
+            display: inline-block;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .section-title:after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: var(--gradiente-vibrante);
+            border-radius: 2px;
+        }
+
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2.5rem;
+        }
+
+        .step {
+            background-color: var(--branco);
+            border-radius: 20px;
+            padding: 2.5rem 2rem;
+            box-shadow: var(--sombra);
+            transition: var(--transicao);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(59, 130, 246, 0.1);
+        }
+
+        .step:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5px;
+            height: 100%;
+            background: var(--gradiente-vibrante);
+            transition: var(--transicao);
+        }
+
+        .step:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--sombra-destaque);
+        }
+
+        .step:hover:before {
+            width: 8px;
+        }
+
+        .step-icon {
+            width: 90px;
+            height: 90px;
+            background: rgba(37, 99, 235, 0.1);
+            color: var(--azul-vibrante);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.3rem;
+            margin: 0 auto 1.8rem;
+            transition: var(--transicao);
+            position: relative;
+        }
+
+        .step:hover .step-icon {
+            transform: scale(1.1) rotate(5deg);
+            background: var(--gradiente-vibrante);
+            color: var(--branco);
+        }
+
+        .step-number {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            width: 30px;
+            height: 30px;
+            background: var(--gradiente-vibrante);
+            color: var(--branco);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        .step-title {
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin-bottom: 1.2rem;
+            color: var(--azul-escuro);
+        }
+
+        .step-description {
+            color: var(--azul-escuro);
+            opacity: 0.8;
+            line-height: 1.7;
+        }
+
+        /* Footer */
+        .footer {
+            background-color: var(--azul-escuro);
+            color: var(--branco);
+            padding: 2.5rem 0;
+            text-align: center;
+            position: relative;
+        }
+
+        .footer:before {
+            content: '';
+            position: absolute;
             top: 0;
             left: 0;
             width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.7);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
+            height: 5px;
+            background: var(--gradiente-vibrante);
         }
-        
-        .modal-content {
-            background-color: white;
-            padding: 2rem;
-            border-radius: 12px;
-            max-width: 500px;
-            width: 90%;
-            max-height: 80vh;
-            overflow-y: auto;
+
+        .footer-text {
+            opacity: 0.8;
+            font-size: 1rem;
         }
-        
-        .modal-close {
-            float: right;
-            font-size: 1.5rem;
-            cursor: pointer;
+
+        /* Animações */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
-        
-        .status-message {
-            margin: 1rem 0;
-            padding: 0.5rem;
-            border-radius: 6px;
-            text-align: center;
+
+        /* Elementos decorativos */
+        .floating-shape {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(37, 99, 235, 0.05);
+            animation: float 8s ease-in-out infinite;
         }
-        
-        .status-error {
-            background-color: #ffebee;
-            color: #c62828;
+
+        .shape-1 {
+            width: 100px;
+            height: 100px;
+            top: 20%;
+            left: 10%;
+            animation-delay: 0s;
         }
-        
-        .status-success {
-            background-color: #e8f5e9;
-            color: #2e7d32;
+
+        .shape-2 {
+            width: 150px;
+            height: 150px;
+            bottom: 10%;
+            right: 5%;
+            animation-delay: 1s;
         }
-        
+
+        .shape-3 {
+            width: 70px;
+            height: 70px;
+            top: 50%;
+            left: 5%;
+            animation-delay: 2s;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0) rotate(0deg);
+            }
+            50% {
+                transform: translateY(-20px) rotate(10deg);
+            }
+        }
+
+        /* Responsividade */
+        @media (max-width: 992px) {
+            .hero-title {
+                font-size: 2.8rem;
+            }
+            
+            .section-title {
+                font-size: 2.3rem;
+            }
+        }
+
         @media (max-width: 768px) {
-            main {
-                padding: 1rem;
+            .hero-title {
+                font-size: 2.5rem;
             }
             
-            .card {
-                padding: 1.5rem;
+            .hero-subtitle {
+                font-size: 1.2rem;
             }
             
-            .call-controls {
-                flex-direction: column;
-                gap: 0.5rem;
+            .steps {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+            
+            .step {
+                padding: 2rem 1.5rem;
+            }
+            
+            .separador {
+                height: 100px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero-title {
+                font-size: 2.2rem;
+            }
+            
+            .section-title {
+                font-size: 2rem;
             }
             
             .btn {
-                width: 100%;
+                padding: 1rem 2rem;
+                font-size: 1rem;
             }
             
-            .audio-wrapper {
-                flex-direction: column;
-                gap: 1rem;
+            .step-icon {
+                width: 80px;
+                height: 80px;
+                font-size: 2rem;
+            }
+            
+            .separador {
+                height: 80px;
             }
         }
     </style>
 </head>
 <body>
-    <header>
-        <div class="logo">
-            <span class="logo-icon">🎧</span>
-            <h1>MozVoice</h1>
-        </div>
-        <p>Conecte-se com pessoas de Moçambique <span class="flag">🇲🇿</span></p>
-    </header>
-    
-    <main>
-        <!-- Estado inicial -->
-        <div class="state active" id="state-home">
-            <div class="card">
-                <h2>Iniciar Chamada Aleatória</h2>
-                <p>Converse com pessoas aleatórias de Moçambique através de chamadas de áudio. É rápido, fácil e não requer cadastro.</p>
-                
-                <div class="form-group">
-                    <label for="nickname">Apelido (opcional):</label>
-                    <input type="text" id="nickname" placeholder="Como quer ser chamado?" maxlength="20">
-                </div>
-                
-                <button class="btn" id="btn-start">Iniciar Chamada Aleatória</button>
-                <button class="btn btn-success" id="btn-create-room" style="margin-top: 1rem;">Criar Sala Pública</button>
-                
-                <div id="status-message" class="status-message" style="display: none;"></div>
-            </div>
+    <!-- Elementos decorativos flutuantes -->
+    <div class="floating-shape shape-1"></div>
+    <div class="floating-shape shape-2"></div>
+    <div class="floating-shape shape-3"></div>
 
-            <!-- Lista de salas públicas -->
-            <div class="card">
-                <h3>Salas Públicas Disponíveis</h3>
-                <p><small>Entre em uma sala para começar agora</small></p>
-                <div class="rooms-list" id="rooms-list">
-                    <p id="no-rooms">Nenhuma sala disponível no momento.</p>
+    <!-- Header simplificado -->
+    <header class="header">
+        <div class="container">
+            <a href="#" class="logo">
+                <div class="logo-img">
+                    <i class="fas fa-coins"></i>
                 </div>
-            </div>
-            
-            <div class="card">
-                <h3>Como funciona</h3>
-                <p>1. Clique em "Iniciar Chamada" ou "Criar Sala"</p>
-                <p>2. Aguarde ou entre em uma sala pública</p>
-                <p>3. Converse através de áudio</p>
-                <p>4. Clique em "Próximo" para conversar com outra pessoa</p>
+                <span>Moz P2P</span>
+            </a>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h1 class="hero-title">Bem-vindo ao Moz P2P</h1>
+                <p class="hero-subtitle">Plataforma simples e segura para comprar e vender USD/USDT em Moçambique</p>
+                <a href="dashboard.html" class="btn">
+                    <i class="fas fa-arrow-right"></i> Entrar Agora
+                </a>
             </div>
         </div>
-        
-        <!-- Estado procurando -->
-        <div class="state" id="state-searching">
-            <div class="card">
-                <h2>Procurando parceiro...</h2>
-                <p>Estamos buscando alguém para conectar com você. Isso pode levar alguns instantes.</p>
-                
-                <div class="searching-animation">
-                    <div class="dot"></div>
-                    <div class="dot"></div>
-                    <div class="dot"></div>
-                </div>
-                
-                <button class="btn btn-danger" id="btn-cancel-search">Cancelar</button>
-            </div>
-        </div>
-        
-        <!-- Estado em chamada -->
-        <div class="state" id="state-in-call">
-            <div class="card">
-                <h2>Em chamada</h2>
-                <p>Conectado com: <span id="partner-name">Alguém</span></p>
-                
-                <div class="audio-container">
-                    <div class="audio-wrapper">
-                        <div>
-                            <div class="audio-label">Seu áudio:</div>
-                            <div class="volume-indicator">
-                                <div class="volume-level" id="volume-level-local"></div>
-                            </div>
-                        </div>
-                        <div>
-                            <div class="audio-label">Áudio remoto:</div>
-                            <div class="volume-indicator">
-                                <div class="volume-level" id="volume-level-remote"></div>
-                            </div>
-                        </div>
+    </section>
+
+    <!-- Separador com degradê -->
+    <div class="separador"></div>
+
+    <!-- Como Funciona -->
+    <section class="how-it-works">
+        <div class="container">
+            <h2 class="section-title">Como Funciona</h2>
+            <div class="steps">
+                <div class="step">
+                    <div class="step-icon">
+                        <i class="fas fa-user-plus"></i>
+                        <div class="step-number">1</div>
                     </div>
+                    <h3 class="step-title">Cadastre-se</h3>
+                    <p class="step-description">Crie sua conta em segundos com e-mail e verificação de telefone. Processo rápido e seguro.</p>
                 </div>
-                
-                <audio id="remote-audio" autoplay></audio>
-                
-                <div class="call-controls">
-                    <button class="btn btn-warning" id="btn-next">Próximo</button>
-                    <button class="btn btn-danger" id="btn-end-call">Sair</button>
+                <div class="step">
+                    <div class="step-icon">
+                        <i class="fas fa-ad"></i>
+                        <div class="step-number">2</div>
+                    </div>
+                    <h3 class="step-title">Crie ou aceite anúncios</h3>
+                    <p class="step-description">Escolha comprar ou vender USD/USDT ao melhor câmbio do mercado com total transparência.</p>
+                </div>
+                <div class="step">
+                    <div class="step-icon">
+                        <i class="fas fa-comments"></i>
+                        <div class="step-number">3</div>
+                    </div>
+                    <h3 class="step-title">Finalize no chat seguro</h3>
+                    <p class="step-description">Converse com o agente e conclua a transação de forma segura com nosso sistema protegido.</p>
                 </div>
             </div>
         </div>
-    </main>
-    
-    <footer>
-        <p>⚠️ Não compartilhe informações pessoais durante as chamadas</p>
-        <p><a href="#" class="privacy-link" id="privacy-policy">Política de Privacidade</a> | <a href="#" class="privacy-link" id="terms-of-use">Termos de Uso</a></p>
-        <p>© 2025 MozVoice - Conexões que importam</p>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p class="footer-text">© 2025 Moz P2P – Todos os direitos reservados.</p>
+        </div>
     </footer>
 
-    <!-- Modal de Privacidade -->
-    <div class="privacy-modal" id="privacy-modal">
-        <div class="modal-content">
-            <span class="modal-close" id="modal-close">&times;</span>
-            <h2>Política de Privacidade</h2>
-            <p>O MozVoice respeita sua privacidade. Todas as chamadas são anônimas e não armazenamos o conteúdo das conversas. Coletamos apenas informações necessárias para o funcionamento do serviço.</p>
-            <p>Seus dados pessoais não são compartilhados dengan terceiros. Ao usar nosso serviço, você concorda com nossos termos de uso.</p>
-        </div>
-    </div>
-
     <script>
-        // 🔑 CREDENCIAIS DO SUPABASE
-        const SUPABASE_URL = 'https://lsgbijmmxredmqxyxnsp.supabase.co';
-        const SUPABASE_ANON_KEY = 'sb_publishable_bD8yP5WqAe1TCO5WXcRWgg_-GfCfcNt';
+        // Animação de digitação para o título
+        function typeWriter(element, text, speed = 100) {
+            let i = 0;
+            element.innerHTML = '';
+            
+            function type() {
+                if (i < text.length) {
+                    element.innerHTML += text.charAt(i);
+                    i++;
+                    setTimeout(type, speed);
+                }
+            }
+            type();
+        }
 
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-        // Elementos
-        const stateHome = document.getElementById('state-home');
-        const stateSearching = document.getElementById('state-searching');
-        const stateInCall = document.getElementById('state-in-call');
-        const btnStart = document.getElementById('btn-start');
-        const btnCreateRoom = document.getElementById('btn-create-room');
-        const btnCancelSearch = document.getElementById('btn-cancel-search');
-        const btnNext = document.getElementById('btn-next');
-        const btnEndCall = document.getElementById('btn-end-call');
-        const nicknameInput = document.getElementById('nickname');
-        const partnerName = document.getElementById('partner-name');
-        const volumeLevelLocal = document.getElementById('volume-level-local');
-        const volumeLevelRemote = document.getElementById('volume-level-remote');
-        const remoteAudio = document.getElementById('remote-audio');
-        const roomsList = document.getElementById('rooms-list');
-        const noRooms = document.getElementById('no-rooms');
-        const statusMessage = document.getElementById('status-message');
-
-        const privacyModal = document.getElementById('privacy-modal');
-        const privacyPolicyLink = document.getElementById('privacy-policy');
-        const termsOfUseLink = document.getElementById('terms-of-use');
-        const modalClose = document.getElementById('modal-close');
-
-        // Estado
-        let userId = null;
-        let currentRoomId = null;
-        let partnerId = null;
-        let localStream = null;
-        let peerConnection = null;
-        let isCaller = false;
-        let volumeInterval = null;
-        let audioContext = null;
-        let searchTimeout = null;
-        let publicRoomId = null;
-        let queueSubscription = null;
-        let roomSubscription = null;
-        let iceSubscription = null;
-        let publicRoomsSubscription = null;
-
-        // Config WebRTC
-        const rtcConfig = {
-            iceServers: [{ urls: 'stun:stun.l.google.com:19302' }]
-        };
-
-        // Inicializar
-        document.addEventListener('DOMContentLoaded', () => {
-            userId = getOrCreateUserId();
-            setupEventListeners();
-            loadPublicRooms();
+        // Iniciar animação de digitação quando a página carregar
+        window.addEventListener('DOMContentLoaded', (event) => {
+            const heroTitle = document.querySelector('.hero-title');
+            const originalText = heroTitle.textContent;
+            heroTitle.style.minHeight = heroTitle.offsetHeight + 'px';
+            typeWriter(heroTitle, originalText, 120);
         });
 
-        function getOrCreateUserId() {
-            let id = localStorage.getItem('mozvoice_user_id');
-            if (!id) {
-                id = 'user_' + Math.random().toString(36).substr(2, 9);
-                localStorage.setItem('mozvoice_user_id', id);
-            }
-            return id;
-        }
-
-        function setupEventListeners() {
-            btnStart.addEventListener('click', startSearching);
-            btnCreateRoom.addEventListener('click', createPublicRoom);
-            btnCancelSearch.addEventListener('click', cancelSearch);
-            btnNext.addEventListener('click', nextPartner);
-            btnEndCall.addEventListener('click', endCall);
-            privacyPolicyLink.addEventListener('click', showPrivacyModal);
-            termsOfUseLink.addEventListener('click', showPrivacyModal);
-            modalClose.addEventListener('click', hidePrivacyModal);
-            window.addEventListener('click', (e) => {
-                if (e.target === privacyModal) hidePrivacyModal();
-            });
-        }
-
-        function showPrivacyModal(e) {
-            e.preventDefault();
-            privacyModal.style.display = 'flex';
-        }
-
-        function hidePrivacyModal() {
-            privacyModal.style.display = 'none';
-        }
-
-        function showState(el) {
-            [stateHome, stateSearching, stateInCall].forEach(s => s.classList.remove('active'));
-            el.classList.add('active');
-        }
-
-        function showStatus(message, isError = false) {
-            statusMessage.textContent = message;
-            statusMessage.className = isError ? 'status-message status-error' : 'status-message status-success';
-            statusMessage.style.display = 'block';
-            
-            setTimeout(() => {
-                statusMessage.style.display = 'none';
-            }, 30000);
-        }
-
-        async function startSearching() {
-            const nickname = nicknameInput.value.trim() || 'Anônimo';
-            showState(stateSearching);
-
-            searchTimeout = setTimeout(() => {
-                if (stateSearching.classList.contains('active')) {
-                    cancelSearch();
-                    showStatus('Não foi possível encontrar um parceiro. Tente novamente.', true);
-                }
-            }, 300000);
-
-            try {
-                // Adiciona usuário à fila
-                const { error } = await supabase
-                    .from('queue')
-                    .insert([{ 
-                        id: userId, 
-                        nickname: nickname,
-                        created_at: new Date().toISOString()
-                    }]);
-
-                if (error) {
-                    if (error.code === '23505') {
-                        // Já está na fila, apenas procura por parceiro
-                        await findPartner(nickname);
-                        return;
-                    }
-                    throw error;
-                }
-
-                await findPartner(nickname);
-            } catch (error) {
-                console.error('Erro ao entrar na fila:', error);
-                cancelSearch();
-                showStatus('Erro ao iniciar a busca. Tente novamente.', true);
-            }
-        }
-
-        async function findPartner(nickname) {
-            try {
-                // Verifica se já existe alguém na fila
-                const { data: users, error } = await supabase
-                    .from('queue')
-                    .select('id, nickname')
-                    .neq('id', userId)
-                    .order('created_at', { ascending: true })
-                    .limit(1);
-
-                if (error) throw error;
-
-                if (users && users.length > 0) {
-                    const partner = users[0];
-                    await connectWithPartner(partner, nickname);
-                    return;
-                }
-
-                // Se não encontrou ninguém, escuta por novos usuários
-                queueSubscription = supabase
-                    .channel('queue-changes')
-                    .on('postgres_changes', 
-                        { 
-                            event: 'INSERT', 
-                            schema: 'public', 
-                            table: 'queue' 
-                        }, 
-                        async (payload) => {
-                            if (payload.new.id !== userId) {
-                                // Encontrou um parceiro
-                                queueSubscription.unsubscribe();
-                                clearTimeout(searchTimeout);
-                                await connectWithPartner(payload.new, nickname);
-                            }
-                        }
-                    )
-                    .subscribe();
-            } catch (error) {
-                console.error('Erro ao buscar parceiro:', error);
-                cancelSearch();
-                showStatus('Erro ao buscar parceiro. Tente novamente.', true);
-            }
-        }
-
-        async function connectWithPartner(partner, myNickname) {
-            try {
-                // Remove ambos da fila
-                await supabase
-                    .from('queue')
-                    .delete()
-                    .in('id', [userId, partner.id]);
-
-                // Cria uma sala
-                const { data: room, error } = await supabase
-                    .from('rooms')
-                    .insert([{
-                        user_a: userId,
-                        user_b: partner.id,
-                        offer: null,
-                        answer: null,
-                        ice_candidates: []
-                    }])
-                    .select()
-                    .single();
-
-                if (error) throw error;
-
-                currentRoomId = room.id;
-                partnerId = partner.id;
-                partnerName.textContent = partner.nickname;
-                
-                // Define quem é o caller (o primeiro a conectar)
-                isCaller = true;
-                
-                await setupWebRTC();
-                showState(stateInCall);
-                startVolumeIndicator();
-            } catch (error) {
-                console.error('Erro ao conectar com parceiro:', error);
-                cancelSearch();
-                showStatus('Erro ao conectar com parceiro. Tente novamente.', true);
-            }
-        }
-
-        async function createPublicRoom() {
-            const nickname = nicknameInput.value.trim() || 'Anônimo';
-            
-            try {
-                const { data: room, error } = await supabase
-                    .from('public_rooms')
-                    .insert([{ 
-                        host_id: userId, 
-                        host_nickname: nickname 
-                    }])
-                    .select()
-                    .single();
-
-                if (error) throw error;
-
-                publicRoomId = room.id;
-                btnCreateRoom.disabled = true;
-                btnCreateRoom.textContent = 'Sala criada! Aguardando...';
-                
-                // Também entra na fila normal
-                await startSearching();
-            } catch (error) {
-                console.error('Erro ao criar sala pública:', error);
-                showStatus('Erro ao criar sala. Tente novamente.', true);
-            }
-        }
-
-        async function loadPublicRooms() {
-            try {
-                const { data: rooms, error } = await supabase
-                    .from('public_rooms')
-                    .select('*');
-
-                if (error) throw error;
-
-                roomsList.innerHTML = '';
-                
-                if (rooms && rooms.length > 0) {
-                    noRooms.style.display = 'none';
-                    rooms.forEach(room => {
-                        if (room.host_id !== userId) {
-                            addRoomToList(room);
-                        }
-                    });
-                } else {
-                    noRooms.style.display = 'block';
-                }
-
-                // Escuta por novas salas
-                setupPublicRoomsListener();
-            } catch (error) {
-                console.error('Erro ao carregar salas:', error);
-            }
-        }
-
-        function setupPublicRoomsListener() {
-            // Remove subscription anterior se existir
-            if (publicRoomsSubscription) {
-                supabase.removeChannel(publicRoomsSubscription);
-            }
-
-            publicRoomsSubscription = supabase
-                .channel('public-rooms-listener')
-                .on('postgres_changes', 
-                    { 
-                        event: '*', 
-                        schema: 'public', 
-                        table: 'public_rooms' 
-                    }, 
-                    (payload) => {
-                        loadPublicRooms();
-                    }
-                )
-                .subscribe();
-        }
-
-        function addRoomToList(room) {
-            const item = document.createElement('div');
-            item.className = 'room-item';
-            item.innerHTML = `
-                <span class="room-host">${room.host_nickname}</span>
-                <button class="join-btn" data-id="${room.id}">
-                    Entrar
-                </button>
-            `;
-            item.querySelector('.join-btn').addEventListener('click', () => joinPublicRoom(room));
-            roomsList.appendChild(item);
-        }
-
-        async function joinPublicRoom(room) {
-            try {
-                const myNickname = nicknameInput.value.trim() || 'Anônimo';
-                
-                // Remove a sala pública
-                await supabase
-                    .from('public_rooms')
-                    .delete()
-                    .eq('id', room.id);
-
-                // Cria uma sala privada
-                const { data: newRoom, error } = await supabase
-                    .from('rooms')
-                    .insert([{
-                        user_a: room.host_id,
-                        user_b: userId,
-                        offer: null,
-                        answer: null,
-                        ice_candidates: []
-                    }])
-                    .select()
-                    .single();
-
-                if (error) throw error;
-
-                currentRoomId = newRoom.id;
-                partnerId = room.host_id;
-                partnerName.textContent = room.host_nickname;
-                
-                // Quem entra na sala pública é o answerer
-                isCaller = false;
-                
-                await setupWebRTC();
-                showState(stateInCall);
-                startVolumeIndicator();
-            } catch (error) {
-                console.error('Erro ao entrar na sala:', error);
-                showStatus('Erro ao entrar na sala. Tente novamente.', true);
-            }
-        }
-
-        async function setupWebRTC() {
-            try {
-                // Obtém acesso ao microfone
-                localStream = await navigator.mediaDevices.getUserMedia({ 
-                    audio: true, 
-                    video: false 
-                });
-                
-                // Configura a conexão peer-to-peer
-                peerConnection = new RTCPeerConnection(rtcConfig);
-                
-                // Adiciona stream local à conexão
-                localStream.getTracks().forEach(track => {
-                    peerConnection.addTrack(track, localStream);
-                });
-                
-                // Escuta por stream remoto
-                peerConnection.addEventListener('track', (event) => {
-                    const remoteStream = event.streams[0];
-                    remoteAudio.srcObject = remoteStream;
-                    remoteAudio.play().catch(e => {
-                        console.warn('Auto-play bloqueado:', e);
-                    });
-                });
-                
-                // Escuta por candidatos ICE
-                peerConnection.addEventListener('icecandidate', (event) => {
-                    if (event.candidate) {
-                        sendIceCandidate(event.candidate);
-                    }
-                });
-                
-                if (isCaller) {
-                    // Cria uma oferta
-                    const offer = await peerConnection.createOffer();
-                    await peerConnection.setLocalDescription(offer);
-                    
-                    // Envia a oferta para o parceiro
-                    await supabase
-                        .from('rooms')
-                        .update({ offer: offer })
-                        .eq('id', currentRoomId);
-                        
-                    // Escuta por respostas
-                    listenForAnswer();
-                } else {
-                    // Escuta por ofertas
-                    listenForOffer();
-                }
-                
-                // Escuta por ICE candidates
-                listenForIceCandidates();
-                
-            } catch (error) {
-                console.error('Erro ao configurar WebRTC:', error);
-                endCall();
-                showStatus('Erro ao acessar o microfone. Verifique as permissões do navegador.', true);
-            }
-        }
-
-        async function sendIceCandidate(candidate) {
-            try {
-                // Obtém os candidates atuais
-                const { data: room, error } = await supabase
-                    .from('rooms')
-                    .select('ice_candidates')
-                    .eq('id', currentRoomId)
-                    .single();
-                    
-                if (error) throw error;
-                
-                // Adiciona o novo candidate
-                const currentCandidates = room.ice_candidates || [];
-                const updatedCandidates = [...currentCandidates, candidate.toJSON()];
-                
-                // Atualiza no banco
-                await supabase
-                    .from('rooms')
-                    .update({ ice_candidates: updatedCandidates })
-                    .eq('id', currentRoomId);
-                    
-            } catch (error) {
-                console.error('Erro ao enviar ICE candidate:', error);
-            }
-        }
-
-        function listenForOffer() {
-            roomSubscription = supabase
-                .channel(`room-offer-${currentRoomId}`)
-                .on('postgres_changes', 
-                    { 
-                        event: 'UPDATE', 
-                        schema: 'public', 
-                        table: 'rooms',
-                        filter: `id=eq.${currentRoomId}`
-                    }, 
-                    async (payload) => {
-                        const room = payload.new;
-                        
-                        if (room.offer && !peerConnection.currentRemoteDescription) {
-                            try {
-                                await peerConnection.setRemoteDescription(room.offer);
-                                
-                                // Cria uma resposta
-                                const answer = await peerConnection.createAnswer();
-                                await peerConnection.setLocalDescription(answer);
-                                
-                                // Envia a resposta
-                                await supabase
-                                    .from('rooms')
-                                    .update({ answer: answer })
-                                    .eq('id', currentRoomId);
-                                    
-                            } catch (error) {
-                                console.error('Erro ao processar oferta:', error);
-                            }
-                        }
-                    }
-                )
-                .subscribe();
-        }
-
-        function listenForAnswer() {
-            roomSubscription = supabase
-                .channel(`room-answer-${currentRoomId}`)
-                .on('postgres_changes', 
-                    { 
-                        event: 'UPDATE', 
-                        schema: 'public', 
-                        table: 'rooms',
-                        filter: `id=eq.${currentRoomId}`
-                    }, 
-                    async (payload) => {
-                        const room = payload.new;
-                        
-                        if (room.answer && !peerConnection.currentRemoteDescription) {
-                            try {
-                                await peerConnection.setRemoteDescription(room.answer);
-                            } catch (error) {
-                                console.error('Erro ao processar resposta:', error);
-                            }
-                        }
-                    }
-                )
-                .subscribe();
-        }
-
-        function listenForIceCandidates() {
-            iceSubscription = supabase
-                .channel(`room-ice-${currentRoomId}`)
-                .on('postgres_changes', 
-                    { 
-                        event: 'UPDATE', 
-                        schema: 'public', 
-                        table: 'rooms',
-                        filter: `id=eq.${currentRoomId}`
-                    }, 
-                    async (payload) => {
-                        const room = payload.new;
-                        const oldRoom = payload.old;
-                        
-                        if (room.ice_candidates && room.ice_candidates.length > 0) {
-                            // Encontra novos candidates
-                            const oldCandidates = oldRoom?.ice_candidates || [];
-                            const newCandidates = room.ice_candidates.filter(
-                                nc => !oldCandidates.some(oc => 
-                                    oc.candidate === nc.candidate && 
-                                    oc.sdpMid === nc.sdpMid
-                                )
-                            );
-                            
-                            // Adiciona os novos candidates
-                            for (const candidateData of newCandidates) {
-                                try {
-                                    await peerConnection.addIceCandidate(candidateData);
-                                } catch (error) {
-                                    console.error('Erro ao adicionar ICE candidate:', error);
-                                }
-                            }
-                        }
-                    }
-                )
-                .subscribe();
-        }
-
-        function startVolumeIndicator() {
-            if (volumeInterval) clearInterval(volumeInterval);
-            
-            audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            const source = audioContext.createMediaStreamSource(localStream);
-            const analyser = audioContext.createAnalyser();
-            analyser.fftSize = 256;
-            source.connect(analyser);
-            
-            const dataArray = new Uint8Array(analyser.frequencyBinCount);
-            
-            volumeInterval = setInterval(() => {
-                analyser.getByteFrequencyData(dataArray);
-                const average = dataArray.reduce((a, b) => a + b, 0) / dataArray.length;
-                volumeLevelLocal.style.width = Math.min(average * 2, 100) + '%';
-                
-                // Simula volume remoto (em uma implementação real, usaria o stream remoto)
-                volumeLevelRemote.style.width = Math.min(average * 1.5, 100) + '%';
-            }, 100);
-        }
-
-        function cancelSearch() {
-            if (searchTimeout) clearTimeout(searchTimeout);
-            
-            // Remove da fila
-            supabase
-                .from('queue')
-                .delete()
-                .eq('id', userId);
-                
-            // Remove sala pública se existir
-            if (publicRoomId) {
-                supabase
-                    .from('public_rooms')
-                    .delete()
-                    .eq('id', publicRoomId);
-                    
-                publicRoomId = null;
-                btnCreateRoom.disabled = false;
-                btnCreateRoom.textContent = 'Criar Sala Pública';
-            }
-            
-            // Cancela subscriptions
-            if (queueSubscription) {
-                queueSubscription.unsubscribe();
-                queueSubscription = null;
-            }
-            
-            showState(stateHome);
-        }
-
-        function nextPartner() {
-            endCall();
-            setTimeout(startSearching, 500);
-        }
-
-        async function endCall() {
-            // Para medição de volume
-            if (volumeInterval) {
-                clearInterval(volumeInterval);
-                volumeInterval = null;
-            }
-            
-            // Fecha contexto de áudio
-            if (audioContext) {
-                await audioContext.close();
-                audioContext = null;
-            }
-            
-            // Para stream local
-            if (localStream) {
-                localStream.getTracks().forEach(track => track.stop());
-                localStream = null;
-            }
-            
-            // Fecha conexão peer-to-peer
-            if (peerConnection) {
-                peerConnection.close();
-                peerConnection = null;
-            }
-            
-            // Remove sala
-            if (currentRoomId) {
-                await supabase
-                    .from('rooms')
-                    .delete()
-                    .eq('id', currentRoomId);
-                    
-                currentRoomId = null;
-            }
-            
-            // Remove da fila
-            await supabase
-                .from('queue')
-                .delete()
-                .eq('id', userId);
-                
-            // Remove sala pública se existir
-            if (publicRoomId) {
-                await supabase
-                    .from('public_rooms')
-                    .delete()
-                    .eq('id', publicRoomId);
-                    
-                publicRoomId = null;
-                btnCreateRoom.disabled = false;
-                btnCreateRoom.textContent = 'Criar Sala Pública';
-            }
-            
-            // Cancela timeout de busca
-            if (searchTimeout) {
-                clearTimeout(searchTimeout);
-                searchTimeout = null;
-            }
-            
-            // Cancela subscriptions
-            if (queueSubscription) {
-                queueSubscription.unsubscribe();
-                queueSubscription = null;
-            }
-            
-            if (roomSubscription) {
-                roomSubscription.unsubscribe();
-                roomSubscription = null;
-            }
-            
-            if (iceSubscription) {
-                iceSubscription.unsubscribe();
-                iceSubscription = null;
-            }
-            
-            if (publicRoomsSubscription) {
-                publicRoomsSubscription.unsubscribe();
-                publicRoomsSubscription = null;
-            }
-            
-            showState(stateHome);
-        }
+        // Adicionando efeito parallax suave
+        window.addEventListener('scroll', function() {
+            const scrolled = window.pageYOffset;
+            const hero = document.querySelector('.hero');
+            hero.style.backgroundPosition = `center ${scrolled * 0.5}px`;
+        });
     </script>
 </body>
 </html>
