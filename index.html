@@ -3,22 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Moz P2P - Plataforma de pagamentos P2P</title>
+    <title>Moz P2P - Plataforma de Câmbio P2P</title>
+    
+    <!-- Google Fonts: Poppins -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <style>
         :root {
-            --azul-escuro: #1e3a8a;
+            --azul-escuro: #0f172a;
+            --azul-medio: #1e3a8a;
             --azul-claro: #3b82f6;
-            --azul-vibrante: #2563eb;
+            --roxo-suave: #6366f1;
             --branco: #f8fafc;
-            --branco-suave: #f1f5f9;
-            --cinza-claro: #e5e7eb;
-            --gradiente-azul: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
-            --gradiente-vibrante: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-            --gradiente-separador: linear-gradient(to bottom, #3b82f6, #f1f5f9);
+            --gradiente-azul-roxo: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
+            --gradiente-hero: linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%);
+            --gradiente-texto: linear-gradient(135deg, #3b82f6, #6366f1);
             --sombra: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 5px 10px -5px rgba(0, 0, 0, 0.04);
             --sombra-destaque: 0 20px 40px -10px rgba(37, 99, 235, 0.3);
             --transicao: all 0.3s ease;
@@ -32,9 +36,9 @@
 
         body {
             font-family: 'Poppins', sans-serif;
-            color: var(--azul-escuro);
+            color: var(--branco);
             line-height: 1.6;
-            background-color: var(--branco-suave);
+            background-color: var(--azul-escuro);
             overflow-x: hidden;
         }
 
@@ -45,21 +49,42 @@
             padding: 0 1.5rem;
         }
 
-        /* Header simplificado */
+        /* Header com blur e centralização */
         .header {
-            padding: 1.5rem 0;
-            background-color: var(--branco-suave);
+            padding: 1.2rem 0;
+            background-color: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            transition: var(--transicao);
+        }
+
+        .header.scrolled {
+            padding: 0.8rem 0;
+        }
+
+        .nav {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 2rem;
             position: relative;
-            text-align: center;
         }
 
         .logo {
-            display: inline-flex;
+            display: flex;
             align-items: center;
             gap: 0.75rem;
             font-weight: 700;
-            font-size: 1.8rem;
-            color: var(--azul-escuro);
+            font-size: 1.6rem;
+            background: var(--gradiente-texto);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
             text-decoration: none;
             transition: var(--transicao);
         }
@@ -68,27 +93,38 @@
             transform: scale(1.03);
         }
 
-        .logo-img {
-            width: 50px;
-            height: 50px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: var(--gradiente-vibrante);
+        .btn-nav {
+            padding: 0.7rem 1.5rem;
+            background: var(--gradiente-azul-roxo);
             color: var(--branco);
-            border-radius: 12px;
+            border: none;
+            border-radius: 50px;
+            font-weight: 600;
+            text-decoration: none;
             transition: var(--transicao);
+            box-shadow: var(--sombra);
+            position: absolute;
+            right: 0;
+            min-width: 100px;
+            text-align: center;
         }
 
-        .logo:hover .logo-img {
-            transform: rotate(5deg);
+        .btn-nav:hover {
+            transform: scale(1.05);
+            box-shadow: var(--sombra-destaque);
         }
 
-        /* Hero Section com degradê de separação */
+        /* Ajuste para centralizar logo mesmo com botão ao lado */
+        @media (max-width: 768px) {
+            .nav {
+                justify-content: space-between;
+            }
+        }
+
+        /* Hero Section */
         .hero {
-            background: var(--gradiente-azul);
-            color: var(--branco);
-            padding: 6rem 0 5rem;
+            background: var(--gradiente-hero);
+            padding: 10rem 0 6rem;
             text-align: center;
             position: relative;
             overflow: hidden;
@@ -101,7 +137,7 @@
             right: -50%;
             width: 100%;
             height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.1) 0%, rgba(99, 102, 241, 0) 70%);
             transform: rotate(15deg);
         }
 
@@ -131,8 +167,8 @@
         .btn {
             display: inline-block;
             padding: 1.1rem 2.8rem;
-            background: var(--branco-suave);
-            color: var(--azul-escuro);
+            background: var(--gradiente-azul-roxo);
+            color: var(--branco);
             border: none;
             border-radius: 50px;
             font-size: 1.1rem;
@@ -153,7 +189,7 @@
             left: -100%;
             width: 100%;
             height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
             transition: 0.5s;
         }
 
@@ -166,17 +202,30 @@
             left: 100%;
         }
 
-        /* Separador com degradê */
-        .separador {
-            height: 150px;
-            background: var(--gradiente-separador);
-            width: 100%;
+        /* Seção Explicativa */
+        .explicacao {
+            padding: 6rem 0;
+            background-color: var(--azul-medio);
+            position: relative;
         }
 
-        /* Como Funcuja */
+        .explicacao-content {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .explicacao-texto {
+            font-size: 1.2rem;
+            line-height: 1.8;
+            margin-bottom: 0;
+            opacity: 0.9;
+        }
+
+        /* Como Funciona */
         .how-it-works {
             padding: 6rem 0;
-            background-color: var(--branco-suave);
+            background-color: var(--azul-escuro);
             position: relative;
         }
 
@@ -185,7 +234,7 @@
             font-size: 2.7rem;
             font-weight: 800;
             margin-bottom: 4rem;
-            color: var(--azul-escuro);
+            color: var(--branco);
             position: relative;
             display: inline-block;
             left: 50%;
@@ -200,7 +249,7 @@
             transform: translateX(-50%);
             width: 80px;
             height: 4px;
-            background: var(--gradiente-vibrante);
+            background: var(--gradiente-azul-roxo);
             border-radius: 2px;
         }
 
@@ -211,7 +260,7 @@
         }
 
         .step {
-            background-color: var(--branco);
+            background: rgba(30, 58, 138, 0.3);
             border-radius: 20px;
             padding: 2.5rem 2rem;
             box-shadow: var(--sombra);
@@ -220,6 +269,7 @@
             position: relative;
             overflow: hidden;
             border: 1px solid rgba(59, 130, 246, 0.1);
+            backdrop-filter: blur(10px);
         }
 
         .step:before {
@@ -229,7 +279,7 @@
             left: 0;
             width: 5px;
             height: 100%;
-            background: var(--gradiente-vibrante);
+            background: var(--gradiente-azul-roxo);
             transition: var(--transicao);
         }
 
@@ -245,8 +295,8 @@
         .step-icon {
             width: 90px;
             height: 90px;
-            background: rgba(37, 99, 235, 0.1);
-            color: var(--azul-vibrante);
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--azul-claro);
             border-radius: 20px;
             display: flex;
             align-items: center;
@@ -259,7 +309,7 @@
 
         .step:hover .step-icon {
             transform: scale(1.1) rotate(5deg);
-            background: var(--gradiente-vibrante);
+            background: var(--gradiente-azul-roxo);
             color: var(--branco);
         }
 
@@ -269,7 +319,7 @@
             right: -10px;
             width: 30px;
             height: 30px;
-            background: var(--gradiente-vibrante);
+            background: var(--gradiente-azul-roxo);
             color: var(--branco);
             border-radius: 50%;
             display: flex;
@@ -283,13 +333,59 @@
             font-size: 1.6rem;
             font-weight: 700;
             margin-bottom: 1.2rem;
-            color: var(--azul-escuro);
+            color: var(--branco);
         }
 
         .step-description {
-            color: var(--azul-escuro);
+            color: var(--branco);
             opacity: 0.8;
             line-height: 1.7;
+        }
+
+        /* Benefícios */
+        .beneficios {
+            padding: 6rem 0;
+            background-color: var(--azul-medio);
+            position: relative;
+        }
+
+        .beneficios-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        .beneficio {
+            background: rgba(15, 23, 42, 0.3);
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: center;
+            transition: var(--transicao);
+            border: 1px solid rgba(59, 130, 246, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .beneficio:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--sombra-destaque);
+        }
+
+        .beneficio-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--azul-claro);
+        }
+
+        .beneficio-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--branco);
+        }
+
+        .beneficio-desc {
+            color: var(--branco);
+            opacity: 0.8;
         }
 
         /* Footer */
@@ -299,16 +395,7 @@
             padding: 2.5rem 0;
             text-align: center;
             position: relative;
-        }
-
-        .footer:before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 5px;
-            background: var(--gradiente-vibrante);
+            border-top: 1px solid rgba(59, 130, 246, 0.1);
         }
 
         .footer-text {
@@ -328,12 +415,13 @@
             }
         }
 
-        /* Elementos decorativos */
+        /* Elementos decorativos flutuantes */
         .floating-shape {
             position: absolute;
             border-radius: 50%;
-            background: rgba(37, 99, 235, 0.05);
+            background: rgba(99, 102, 241, 0.05);
             animation: float 8s ease-in-out infinite;
+            z-index: 1;
         }
 
         .shape-1 {
@@ -374,32 +462,34 @@
             .hero-title {
                 font-size: 2.8rem;
             }
-            
             .section-title {
                 font-size: 2.3rem;
             }
         }
 
         @media (max-width: 768px) {
+            .nav {
+                justify-content: space-between;
+            }
+            .logo {
+                font-size: 1.4rem;
+            }
+            .btn-nav {
+                padding: 0.6rem 1.2rem;
+                font-size: 0.95rem;
+            }
+            .hero {
+                padding: 8rem 0 4rem;
+            }
             .hero-title {
                 font-size: 2.5rem;
             }
-            
             .hero-subtitle {
                 font-size: 1.2rem;
             }
-            
-            .steps {
+            .steps, .beneficios-grid {
                 grid-template-columns: 1fr;
                 gap: 2rem;
-            }
-            
-            .step {
-                padding: 2rem 1.5rem;
-            }
-            
-            .separador {
-                height: 100px;
             }
         }
 
@@ -407,24 +497,19 @@
             .hero-title {
                 font-size: 2.2rem;
             }
-            
             .section-title {
                 font-size: 2rem;
             }
-            
+            .logo {
+                font-size: 1.3rem;
+            }
+            .btn-nav {
+                padding: 0.5rem 1rem;
+                font-size: 0.9rem;
+            }
             .btn {
                 padding: 1rem 2rem;
                 font-size: 1rem;
-            }
-            
-            .step-icon {
-                width: 80px;
-                height: 80px;
-                font-size: 2rem;
-            }
-            
-            .separador {
-                height: 80px;
             }
         }
     </style>
@@ -435,15 +520,18 @@
     <div class="floating-shape shape-2"></div>
     <div class="floating-shape shape-3"></div>
 
-    <!-- Header simplificado -->
-    <header class="header">
+    <!-- Header -->
+    <header class="header" id="header">
         <div class="container">
-            <a href="#" class="logo">
-                <div class="logo-img">
+            <nav class="nav">
+                <!-- Logotipo centralizado -->
+                <a href="#" class="logo">
                     <i class="fas fa-coins"></i>
-                </div>
-                <span>Moz P2P</span>
-            </a>
+                    <span>Moz P2P</span>
+                </a>
+                <!-- Botão Entrar no canto direito -->
+                <a href="https://mozp2p.base44.app" class="btn-nav">Entrar</a>
+            </nav>
         </div>
     </header>
 
@@ -452,16 +540,26 @@
         <div class="container">
             <div class="hero-content">
                 <h1 class="hero-title">Bem-vindo ao Moz P2P</h1>
-                <p class="hero-subtitle">Plataforma simples e segura para comprar e vender USD/USDT em Moçambique</p>
-                <a href="dashboard.html" class="btn">
-                    <i class="fas fa-arrow-right"></i> Entrar Agora
+                <p class="hero-subtitle">A forma mais rápida, segura e confiável de comprar e vender USD/USDT em Moçambique.</p>
+                <a href="https://mozp2p.base44.app" class="btn">
+                    <i class="fas fa-arrow-right"></i> Começar Agora
                 </a>
             </div>
         </div>
     </section>
 
-    <!-- Separador com degradê -->
-    <div class="separador"></div>
+    <!-- Seção Explicativa -->
+    <section class="explicacao">
+        <div class="container">
+            <div class="explicacao-content">
+                <p class="explicacao-texto">
+                    O Moz P2P é uma plataforma de câmbio P2P (peer-to-peer) que conecta compradores e vendedores de USD e USDT de forma segura e transparente. 
+                    Aqui, você pode criar anúncios de compra ou venda, negociar diretamente com agentes e finalizar suas transações em um chat seguro integrado à plataforma.
+                    Garantimos rapidez, segurança e suporte profissional em todas as etapas do processo.
+                </p>
+            </div>
+        </div>
+    </section>
 
     <!-- Como Funciona -->
     <section class="how-it-works">
@@ -489,8 +587,37 @@
                         <i class="fas fa-comments"></i>
                         <div class="step-number">3</div>
                     </div>
-                    <h3 class="step-title">Finalize no chat seguro</h3>
-                    <p class="step-description">Converse com o agente e conclua a transação de forma segura com nosso sistema protegido.</p>
+                    <h3 class="step-title">Negocie no chat seguro</h3>
+                    <p class="step-description">Converse com o agente e finalize sua transação de forma segura com nosso sistema protegido.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Benefícios -->
+    <section class="beneficios">
+        <div class="container">
+            <h2 class="section-title">Benefícios do Moz P2P</h2>
+            <div class="beneficios-grid">
+                <div class="beneficio">
+                    <div class="beneficio-icon">🔒</div>
+                    <h3 class="beneficio-title">Segurança garantida</h3>
+                    <p class="beneficio-desc">Todas as transações protegidas com criptografia avançada</p>
+                </div>
+                <div class="beneficio">
+                    <div class="beneficio-icon">⚡</div>
+                    <h3 class="beneficio-title">Rapidez</h3>
+                    <p class="beneficio-desc">Negociações concluídas em minutos</p>
+                </div>
+                <div class="beneficio">
+                    <div class="beneficio-icon">🌍</div>
+                    <h3 class="beneficio-title">Flexibilidade</h3>
+                    <p class="beneficio-desc">Diversos métodos de pagamento disponíveis</p>
+                </div>
+                <div class="beneficio">
+                    <div class="beneficio-icon">📱</div>
+                    <h3 class="beneficio-title">Acessível</h3>
+                    <p class="beneficio-desc">Use no celular ou computador</p>
                 </div>
             </div>
         </div>
@@ -504,6 +631,16 @@
     </footer>
 
     <script>
+        // Efeito de scroll no header
+        window.addEventListener('scroll', function() {
+            const header = document.getElementById('header');
+            if (window.scrollY > 50) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        });
+
         // Animação de digitação para o título
         function typeWriter(element, text, speed = 100) {
             let i = 0;
@@ -519,7 +656,7 @@
             type();
         }
 
-        // Iniciar animação de digitação quando a página carregar
+        // Iniciar animação de digitação
         window.addEventListener('DOMContentLoaded', (event) => {
             const heroTitle = document.querySelector('.hero-title');
             const originalText = heroTitle.textContent;
@@ -527,11 +664,21 @@
             typeWriter(heroTitle, originalText, 120);
         });
 
-        // Adicionando efeito parallax suave
-        window.addEventListener('scroll', function() {
-            const scrolled = window.pageYOffset;
-            const hero = document.querySelector('.hero');
-            hero.style.backgroundPosition = `center ${scrolled * 0.5}px`;
+        // Animação de entrada suave ao rolar
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = 1;
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, { threshold: 0.1, rootMargin: '0px 0px -100px 0px' });
+
+        document.querySelectorAll('.step, .beneficio').forEach(el => {
+            el.style.opacity = 0;
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            observer.observe(el);
         });
     </script>
 </body>
