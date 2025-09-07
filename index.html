@@ -1,685 +1,547 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-MZ">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Moz P2P - Plataforma de Câmbio P2P</title>
-    
-    <!-- Google Fonts: Poppins -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mozp2p — Compre e Venda USDT em Moçambique</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+  <style>
+    :root {
+      --primary: #007AFF;
+      --primary-light: #e6f0ff;
+      --primary-dark: #0051B2;
+      --text: #1d1d1f;
+      --text-light: #86868b;
+      --background: #ffffff;
+      --card-bg: #f5f5f7;
+      --border: #e0e0e0;
+      --success: #34c759;
+      --gray-soft: #fafafa;
+      --usdt-green: #26a17b;
+    }
 
-    <style>
-        :root {
-            --azul-escuro: #0f172a;
-            --azul-medio: #1e3a8a;
-            --azul-claro: #3b82f6;
-            --roxo-suave: #6366f1;
-            --branco: #f8fafc;
-            --gradiente-azul-roxo: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
-            --gradiente-hero: linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%);
-            --gradiente-texto: linear-gradient(135deg, #3b82f6, #6366f1);
-            --sombra: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 5px 10px -5px rgba(0, 0, 0, 0.04);
-            --sombra-destaque: 0 20px 40px -10px rgba(37, 99, 235, 0.3);
-            --transicao: all 0.3s ease;
-        }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--background);
+      color: var(--text);
+      line-height: 1.6;
+      font-weight: 400;
+      overflow-x: hidden;
+      position: relative;
+    }
 
-        body {
-            font-family: 'Poppins', sans-serif;
-            color: var(--branco);
-            line-height: 1.6;
-            background-color: var(--azul-escuro);
-            overflow-x: hidden;
-        }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
 
-        .container {
-            width: 100%;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 1.5rem;
-        }
+    /* ========== ELEMENTOS GRÁFICOS (DESATIVADOS EM MOBILE PARA PERFORMANCE) ========== */
+    .usdt-token, .blob {
+      position: absolute;
+      z-index: -1;
+      pointer-events: none;
+    }
 
-        /* Header com blur e centralização */
-        .header {
-            padding: 1.2rem 0;
-            background-color: rgba(15, 23, 42, 0.85);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 1000;
-            transition: var(--transicao);
-        }
+    /* ========== HERO ========== */
+    .hero {
+      padding: 60px 0 50px;
+      background: linear-gradient(135deg, rgba(255,255,255,1) 0%, rgba(230,240,255,1) 100%);
+      text-align: center;
+    }
 
-        .header.scrolled {
-            padding: 0.8rem 0;
-        }
+    .hero-badge {
+      background: var(--primary-light);
+      color: var(--primary);
+      padding: 6px 16px;
+      border-radius: 9999px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      display: inline-block;
+      margin-bottom: 16px;
+    }
 
-        .nav {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 2rem;
-            position: relative;
-        }
+    .hero h1 {
+      font-size: 2.4rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin: 12px 0 20px;
+      line-height: 1.2;
+    }
 
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            font-weight: 700;
-            font-size: 1.6rem;
-            background: var(--gradiente-texto);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-decoration: none;
-            transition: var(--transicao);
-        }
+    .hero-subtitle {
+      font-size: 1.1rem;
+      color: var(--text);
+      max-width: 90%;
+      margin: 0 auto 32px;
+      line-height: 1.5;
+    }
 
-        .logo:hover {
-            transform: scale(1.03);
-        }
+    .hero-cta {
+      background: var(--primary);
+      color: white;
+      font-size: 1.15rem;
+      font-weight: 600;
+      padding: 16px 48px;
+      border-radius: 9999px;
+      text-decoration: none;
+      display: inline-block;
+      box-shadow: 0 4px 16px rgba(0,122,255,0.3);
+      margin: 12px 0;
+      width: 90%;
+      max-width: 320px;
+    }
 
-        .btn-nav {
-            padding: 0.7rem 1.5rem;
-            background: var(--gradiente-azul-roxo);
-            color: var(--branco);
-            border: none;
-            border-radius: 50px;
-            font-weight: 600;
-            text-decoration: none;
-            transition: var(--transicao);
-            box-shadow: var(--sombra);
-            position: absolute;
-            right: 0;
-            min-width: 100px;
-            text-align: center;
-        }
+    /* ========== STATS ========== */
+    .stats-row {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin: 30px auto 50px;
+      padding: 20px 10px;
+      background: white;
+      border-radius: 20px;
+      max-width: 95%;
+      box-shadow: 0 4px 20px rgba(0,122,255,0.05);
+    }
 
-        .btn-nav:hover {
-            transform: scale(1.05);
-            box-shadow: var(--sombra-destaque);
-        }
+    .stat-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-width: 80px;
+      font-size: 0.9rem;
+    }
 
-        /* Ajuste para centralizar logo mesmo com botão ao lado */
-        @media (max-width: 768px) {
-            .nav {
-                justify-content: space-between;
-            }
-        }
+    .stat-value {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
 
-        /* Hero Section */
-        .hero {
-            background: var(--gradiente-hero);
-            padding: 10rem 0 6rem;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
+    .stat-label {
+      font-size: 0.75rem;
+      color: var(--text-light);
+      text-align: center;
+      line-height: 1.3;
+    }
 
-        .hero:before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -50%;
-            width: 100%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(99, 102, 241, 0.1) 0%, rgba(99, 102, 241, 0) 70%);
-            transform: rotate(15deg);
-        }
+    /* ========== SECTIONS ========== */
+    .section {
+      padding: 80px 0;
+    }
 
-        .hero-content {
-            max-width: 800px;
-            margin: 0 auto;
-            position: relative;
-            z-index: 2;
-        }
+    .section-title {
+      font-size: 2rem;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 24px;
+      line-height: 1.3;
+    }
 
-        .hero-title {
-            font-size: 3.2rem;
-            font-weight: 800;
-            margin-bottom: 1.5rem;
-            line-height: 1.2;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            animation: fadeInUp 0.8s ease-out;
-        }
+    .section-subtitle {
+      font-size: 1rem;
+      color: var(--text-light);
+      text-align: center;
+      max-width: 90%;
+      margin: 0 auto 40px;
+      line-height: 1.5;
+    }
 
-        .hero-subtitle {
-            font-size: 1.3rem;
-            margin-bottom: 2.5rem;
-            opacity: 0.9;
-            animation: fadeInUp 0.8s ease-out 0.2s both;
-        }
+    /* ========== FEATURES ========== */
+    .features-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 24px;
+      margin-top: 30px;
+    }
 
-        .btn {
-            display: inline-block;
-            padding: 1.1rem 2.8rem;
-            background: var(--gradiente-azul-roxo);
-            color: var(--branco);
-            border: none;
-            border-radius: 50px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            text-decoration: none;
-            cursor: pointer;
-            transition: var(--transicao);
-            box-shadow: var(--sombra);
-            position: relative;
-            overflow: hidden;
-            animation: fadeInUp 0.8s ease-out 0.4s both;
-        }
+    @media (min-width: 550px) {
+      .features-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
 
-        .btn:before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: 0.5s;
-        }
+    .feature-card {
+      background: white;
+      padding: 24px;
+      border-radius: 20px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+      border: 1px solid rgba(0,0,0,0.03);
+    }
 
-        .btn:hover {
-            transform: translateY(-5px) scale(1.03);
-            box-shadow: var(--sombra-destaque);
-        }
+    .feature-icon-wrapper {
+      width: 56px;
+      height: 56px;
+      background: var(--primary-light);
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 16px;
+    }
 
-        .btn:hover:before {
-            left: 100%;
-        }
+    .feature-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
 
-        /* Seção Explicativa */
-        .explicacao {
-            padding: 6rem 0;
-            background-color: var(--azul-medio);
-            position: relative;
-        }
+    .feature-desc {
+      font-size: 0.9rem;
+      color: var(--text-light);
+      line-height: 1.5;
+    }
 
-        .explicacao-content {
-            max-width: 800px;
-            margin: 0 auto;
-            text-align: center;
-        }
+    /* ========== STEPS ========== */
+    .steps {
+      background: var(--gray-soft);
+      padding: 80px 0;
+    }
 
-        .explicacao-texto {
-            font-size: 1.2rem;
-            line-height: 1.8;
-            margin-bottom: 0;
-            opacity: 0.9;
-        }
+    .steps-container {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      margin-top: 30px;
+    }
 
-        /* Como Funciona */
-        .how-it-works {
-            padding: 6rem 0;
-            background-color: var(--azul-escuro);
-            position: relative;
-        }
+    .step-card {
+      background: white;
+      padding: 32px 24px;
+      border-radius: 20px;
+      text-align: center;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+    }
 
-        .section-title {
-            text-align: center;
-            font-size: 2.7rem;
-            font-weight: 800;
-            margin-bottom: 4rem;
-            color: var(--branco);
-            position: relative;
-            display: inline-block;
-            left: 50%;
-            transform: translateX(-50%);
-        }
+    .step-number {
+      width: 44px;
+      height: 44px;
+      background: var(--primary);
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin: 0 auto 20px;
+    }
 
-        .section-title:after {
-            content: '';
-            position: absolute;
-            bottom: -10px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 80px;
-            height: 4px;
-            background: var(--gradiente-azul-roxo);
-            border-radius: 2px;
-        }
+    .step-title {
+      font-size: 1.3rem;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
 
-        .steps {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2.5rem;
-        }
+    .step-desc {
+      font-size: 0.95rem;
+      color: var(--text-light);
+      line-height: 1.5;
+    }
 
-        .step {
-            background: rgba(30, 58, 138, 0.3);
-            border-radius: 20px;
-            padding: 2.5rem 2rem;
-            box-shadow: var(--sombra);
-            transition: var(--transicao);
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-            border: 1px solid rgba(59, 130, 246, 0.1);
-            backdrop-filter: blur(10px);
-        }
+    /* ========== CTA ========== */
+    .cta {
+      padding: 60px 20px;
+      background: linear-gradient(135deg, #f0f5ff, #e0eaff);
+      border-radius: 32px;
+      margin: 60px auto;
+      max-width: 95%;
+      text-align: center;
+    }
 
-        .step:before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 5px;
-            height: 100%;
-            background: var(--gradiente-azul-roxo);
-            transition: var(--transicao);
-        }
+    .cta-title {
+      font-size: 2.2rem;
+      font-weight: 700;
+      margin-bottom: 20px;
+      line-height: 1.3;
+    }
 
-        .step:hover {
-            transform: translateY(-10px);
-            box-shadow: var(--sombra-destaque);
-        }
+    .cta-subtitle {
+      font-size: 1.05rem;
+      color: var(--text-light);
+      max-width: 90%;
+      margin: 0 auto 40px;
+      line-height: 1.5;
+    }
 
-        .step:hover:before {
-            width: 8px;
-        }
+    .cta-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      max-width: 340px;
+      margin: 0 auto;
+    }
 
-        .step-icon {
-            width: 90px;
-            height: 90px;
-            background: rgba(59, 130, 246, 0.1);
-            color: var(--azul-claro);
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2.3rem;
-            margin: 0 auto 1.8rem;
-            transition: var(--transicao);
-            position: relative;
-        }
+    /* ========== FOOTER ========== */
+    .footer {
+      padding: 40px 20px 30px;
+      text-align: center;
+      color: var(--text-light);
+      font-size: 0.9rem;
+      line-height: 1.6;
+      border-top: 1px solid rgba(0,0,0,0.05);
+    }
 
-        .step:hover .step-icon {
-            transform: scale(1.1) rotate(5deg);
-            background: var(--gradiente-azul-roxo);
-            color: var(--branco);
-        }
+    /* ========== MEDIA QUERIES ========== */
+    @media (min-width: 768px) {
+      .hero h1 { font-size: 3.5rem; }
+      .hero-subtitle { font-size: 1.3rem; max-width: 760px; }
+      .hero-cta { width: auto; padding: 20px 64px; font-size: 1.2rem; }
+      .stats-row { padding: 32px; max-width: 1000px; }
+      .stat-box { min-width: 140px; }
+      .stat-value { font-size: 1.6rem; }
+      .stat-label { font-size: 0.85rem; }
+      .section { padding: 120px 0; }
+      .section-title { font-size: 2.8rem; }
+      .section-subtitle { font-size: 1.25rem; max-width: 760px; }
+      .features-grid { grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 48px; }
+      .feature-card { padding: 48px 40px; border-radius: 32px; }
+      .feature-icon-wrapper { width: 80px; height: 80px; }
+      .feature-title { font-size: 1.45rem; }
+      .steps { padding: 120px 0; }
+      .step-card { padding: 56px 40px 48px; border-radius: 32px; }
+      .step-number { width: 60px; height: 60px; font-size: 1.5rem; }
+      .step-title { font-size: 1.5rem; }
+      .cta { padding: 100px 60px; max-width: 1100px; border-radius: 48px; }
+      .cta-title { font-size: 3rem; }
+      .cta-subtitle { font-size: 1.35rem; max-width: 800px; }
+      .cta-buttons { max-width: 560px; gap: 36px; }
+    }
 
-        .step-number {
-            position: absolute;
-            top: -10px;
-            right: -10px;
-            width: 30px;
-            height: 30px;
-            background: var(--gradiente-azul-roxo);
-            color: var(--branco);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            font-size: 0.9rem;
-        }
+    @media (max-width: 480px) {
+      .container { padding: 0 16px; }
+      .hero { padding: 50px 0 40px; }
+      .hero h1 { font-size: 2.1rem; }
+      .hero-subtitle { font-size: 1rem; }
+      .hero-cta { padding: 14px 40px; font-size: 1.1rem; }
+      .stats-row { padding: 16px 8px; gap: 8px; }
+      .stat-box { min-width: 70px; }
+      .stat-value { font-size: 1.2rem; }
+      .stat-label { font-size: 0.7rem; }
+      .section { padding: 70px 0; }
+      .section-title { font-size: 1.8rem; }
+      .section-subtitle { font-size: 0.95rem; }
+      .feature-card { padding: 20px; }
+      .feature-icon-wrapper { width: 50px; height: 50px; }
+      .feature-title { font-size: 1.15rem; }
+      .feature-desc { font-size: 0.87rem; }
+      .step-card { padding: 28px 20px; }
+      .step-number { width: 40px; height: 40px; font-size: 1.2rem; }
+      .step-title { font-size: 1.25rem; }
+      .step-desc { font-size: 0.9rem; }
+      .cta { padding: 50px 16px; border-radius: 28px; margin: 50px auto; }
+      .cta-title { font-size: 2rem; }
+      .cta-subtitle { font-size: 1rem; }
+      .cta-buttons { gap: 16px; }
+      .footer { padding: 30px 16px 20px; font-size: 0.87rem; }
+    }
 
-        .step-title {
-            font-size: 1.6rem;
-            font-weight: 700;
-            margin-bottom: 1.2rem;
-            color: var(--branco);
-        }
+    /* ========== USDT ICONS (SOMENTE EM DESKTOP) ========== */
+    @media (min-width: 768px) {
+      body::before {
+        content: "";
+        position: absolute;
+        top: 15%;
+        left: 10%;
+        width: 60px;
+        height: 60px;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none'%3E%3Ccircle cx='12' cy='12' r='10' stroke='%2326a17b' stroke-width='2'/%3E%3Cpath d='M7 10L9 8L12 11L15 8L17 10' stroke='%2326a17b' stroke-width='2' stroke-linecap='round'/%3E%3Cpath d='M7 14L9 16L12 13L15 16L17 14' stroke='%2326a17b' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+        opacity: 0.06;
+        animation: float-usdt 15s ease-in-out infinite;
+        z-index: -1;
+      }
 
-        .step-description {
-            color: var(--branco);
-            opacity: 0.8;
-            line-height: 1.7;
-        }
+      body::after {
+        content: "";
+        position: absolute;
+        bottom: 20%;
+        right: 8%;
+        width: 40px;
+        height: 40px;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none'%3E%3Ccircle cx='12' cy='12' r='10' stroke='%2326a17b' stroke-width='2'/%3E%3Cpath d='M7 10L9 8L12 11L15 8L17 10' stroke='%2326a17b' stroke-width='2' stroke-linecap='round'/%3E%3Cpath d='M7 14L9 16L12 13L15 16L17 14' stroke='%2326a17b' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+        opacity: 0.06;
+        animation: float-usdt 15s ease-in-out infinite;
+        animation-delay: 3s;
+        z-index: -1;
+      }
 
-        /* Benefícios */
-        .beneficios {
-            padding: 6rem 0;
-            background-color: var(--azul-medio);
-            position: relative;
-        }
-
-        .beneficios-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 2rem;
-        }
-
-        .beneficio {
-            background: rgba(15, 23, 42, 0.3);
-            border-radius: 16px;
-            padding: 2rem;
-            text-align: center;
-            transition: var(--transicao);
-            border: 1px solid rgba(59, 130, 246, 0.1);
-            backdrop-filter: blur(10px);
-        }
-
-        .beneficio:hover {
-            transform: translateY(-5px);
-            box-shadow: var(--sombra-destaque);
-        }
-
-        .beneficio-icon {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-            color: var(--azul-claro);
-        }
-
-        .beneficio-title {
-            font-size: 1.3rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-            color: var(--branco);
-        }
-
-        .beneficio-desc {
-            color: var(--branco);
-            opacity: 0.8;
-        }
-
-        /* Footer */
-        .footer {
-            background-color: var(--azul-escuro);
-            color: var(--branco);
-            padding: 2.5rem 0;
-            text-align: center;
-            position: relative;
-            border-top: 1px solid rgba(59, 130, 246, 0.1);
-        }
-
-        .footer-text {
-            opacity: 0.8;
-            font-size: 1rem;
-        }
-
-        /* Animações */
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* Elementos decorativos flutuantes */
-        .floating-shape {
-            position: absolute;
-            border-radius: 50%;
-            background: rgba(99, 102, 241, 0.05);
-            animation: float 8s ease-in-out infinite;
-            z-index: 1;
-        }
-
-        .shape-1 {
-            width: 100px;
-            height: 100px;
-            top: 20%;
-            left: 10%;
-            animation-delay: 0s;
-        }
-
-        .shape-2 {
-            width: 150px;
-            height: 150px;
-            bottom: 10%;
-            right: 5%;
-            animation-delay: 1s;
-        }
-
-        .shape-3 {
-            width: 70px;
-            height: 70px;
-            top: 50%;
-            left: 5%;
-            animation-delay: 2s;
-        }
-
-        @keyframes float {
-            0%, 100% {
-                transform: translateY(0) rotate(0deg);
-            }
-            50% {
-                transform: translateY(-20px) rotate(10deg);
-            }
-        }
-
-        /* Responsividade */
-        @media (max-width: 992px) {
-            .hero-title {
-                font-size: 2.8rem;
-            }
-            .section-title {
-                font-size: 2.3rem;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .nav {
-                justify-content: space-between;
-            }
-            .logo {
-                font-size: 1.4rem;
-            }
-            .btn-nav {
-                padding: 0.6rem 1.2rem;
-                font-size: 0.95rem;
-            }
-            .hero {
-                padding: 8rem 0 4rem;
-            }
-            .hero-title {
-                font-size: 2.5rem;
-            }
-            .hero-subtitle {
-                font-size: 1.2rem;
-            }
-            .steps, .beneficios-grid {
-                grid-template-columns: 1fr;
-                gap: 2rem;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .hero-title {
-                font-size: 2.2rem;
-            }
-            .section-title {
-                font-size: 2rem;
-            }
-            .logo {
-                font-size: 1.3rem;
-            }
-            .btn-nav {
-                padding: 0.5rem 1rem;
-                font-size: 0.9rem;
-            }
-            .btn {
-                padding: 1rem 2rem;
-                font-size: 1rem;
-            }
-        }
-    </style>
+      @keyframes float-usdt {
+        0%, 100% { transform: translateY(0) rotate(0deg); }
+        25% { transform: translateY(-20px) rotate(5deg); }
+        50% { transform: translateY(10px) rotate(-3deg); }
+        75% { transform: translateY(-10px) rotate(2deg); }
+      }
+    }
+  </style>
 </head>
 <body>
-    <!-- Elementos decorativos flutuantes -->
-    <div class="floating-shape shape-1"></div>
-    <div class="floating-shape shape-2"></div>
-    <div class="floating-shape shape-3"></div>
 
-    <!-- Header -->
-    <header class="header" id="header">
-        <div class="container">
-            <nav class="nav">
-                <!-- Logotipo centralizado -->
-                <a href="#" class="logo">
-                    <i class="fas fa-coins"></i>
-                    <span>Moz P2P</span>
-                </a>
-                <!-- Botão Entrar no canto direito -->
-                <a href="https://mozp2p.base44.app" class="btn-nav">Entrar</a>
-            </nav>
+  <!-- Hero -->
+  <div class="hero">
+    <div class="container">
+      <div class="hero-badge">🛡️ Plataforma Segura para Moçambique</div>
+      <h1>Mozp2p</h1>
+      <p class="hero-subtitle">
+        Uma plataforma mais confortável para comprar e vender USDT em Moçambique.<br>
+        <strong>Transações rápidas</strong>, seguras e com as melhores taxas do mercado.
+      </p>
+      <a href="https://mozp2p.base44.app/Dashboard" class="hero-cta">Entrar na Plataforma →</a>
+    </div>
+  </div>
+
+  <!-- Estatísticas (Layout Horizontal Compacto) -->
+  <div class="container">
+    <div class="stats-row">
+      <div class="stat-box">
+        <span class="stat-value">100%</span>
+        <span class="stat-label">Seguro</span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-value">＜2min</span>
+        <span class="stat-label">Transação Média</span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-value">7K+</span>
+        <span class="stat-label">Usuários</span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-value">US$2M+</span>
+        <span class="stat-label">Volume</span>
+      </div>
+      <div class="stat-box">
+        <span class="stat-value">99,9%</span>
+        <span class="stat-label">Atividade</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Benefícios (Grid 1 col em mobile, 2 cols a partir de 550px, full em desktop) -->
+  <div class="section">
+    <div class="container">
+      <h2 class="section-title">A Melhor Experiência em Negociação Cripto</h2>
+      <p class="section-subtitle">
+        Desenvolvemos a plataforma mais completa e segura para negociar USDT em Moçambique.
+      </p>
+
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon-wrapper">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 22C12 22 20 18 20 11V5L12 2L4 5V11C4 18 12 22 12 22Z" stroke="currentColor" stroke-width="2.5"/>
+              <path d="M9 12L11 14L15 10" stroke="currentColor" stroke-width="2.5"/>
+            </svg>
+          </div>
+          <h3 class="feature-title">Máxima Segurança</h3>
+          <p class="feature-desc">Proteção avançada com criptografia de ponta e autenticação multi-fator.</p>
         </div>
-    </header>
 
-    <!-- Hero Section -->
-    <section class="hero">
-        <div class="container">
-            <div class="hero-content">
-                <h1 class="hero-title">Bem-vindo ao Moz P2P</h1>
-                <p class="hero-subtitle">A forma mais rápida, segura e confiável de comprar e vender USD/USDT em Moçambique.</p>
-                <a href="https://mozp2p.base44.app" class="btn">
-                    <i class="fas fa-arrow-right"></i> Começar Agora
-                </a>
-            </div>
+        <div class="feature-card">
+          <div class="feature-icon-wrapper">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M13 2L15 10H21L15 14L17 22L9 16L3 18L13 2Z" stroke="currentColor" stroke-width="2.5"/>
+            </svg>
+          </div>
+          <h3 class="feature-title">Transações Instantâneas</h3>
+          <p class="feature-desc">Processamento em tempo real com confirmação imediata.</p>
         </div>
-    </section>
 
-    <!-- Seção Explicativa -->
-    <section class="explicacao">
-        <div class="container">
-            <div class="explicacao-content">
-                <p class="explicacao-texto">
-                    O Moz P2P é uma plataforma de câmbio P2P (peer-to-peer) que conecta compradores e vendedores de USD e USDT de forma segura e transparente. 
-                    Aqui, você pode criar anúncios de compra ou venda, negociar diretamente com agentes e finalizar suas transações em um chat seguro integrado à plataforma.
-                    Garantimos rapidez, segurança e suporte profissional em todas as etapas do processo.
-                </p>
-            </div>
+        <div class="feature-card">
+          <div class="feature-icon-wrapper">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="2" y="6" width="20" height="12" rx="2.5" stroke="currentColor" stroke-width="2.5"/>
+              <path d="M18 8V14" stroke="currentColor" stroke-width="2.5"/>
+            </svg>
+          </div>
+          <h3 class="feature-title">Múltiplos Pagamentos</h3>
+          <p class="feature-desc">M-Pesa, transferência bancária e outros meios locais.</p>
         </div>
-    </section>
 
-    <!-- Como Funciona -->
-    <section class="how-it-works">
-        <div class="container">
-            <h2 class="section-title">Como Funciona</h2>
-            <div class="steps">
-                <div class="step">
-                    <div class="step-icon">
-                        <i class="fas fa-user-plus"></i>
-                        <div class="step-number">1</div>
-                    </div>
-                    <h3 class="step-title">Cadastre-se</h3>
-                    <p class="step-description">Crie sua conta em segundos com e-mail e verificação de telefone. Processo rápido e seguro.</p>
-                </div>
-                <div class="step">
-                    <div class="step-icon">
-                        <i class="fas fa-ad"></i>
-                        <div class="step-number">2</div>
-                    </div>
-                    <h3 class="step-title">Crie ou aceite anúncios</h3>
-                    <p class="step-description">Escolha comprar ou vender USD/USDT ao melhor câmbio do mercado com total transparência.</p>
-                </div>
-                <div class="step">
-                    <div class="step-icon">
-                        <i class="fas fa-comments"></i>
-                        <div class="step-number">3</div>
-                    </div>
-                    <h3 class="step-title">Negocie no chat seguro</h3>
-                    <p class="step-description">Converse com o agente e finalize sua transação de forma segura com nosso sistema protegido.</p>
-                </div>
-            </div>
+        <div class="feature-card">
+          <div class="feature-icon-wrapper">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M2 12H5L8 5L12 18L16 8L19 15H22" stroke="currentColor" stroke-width="2.5"/>
+            </svg>
+          </div>
+          <h3 class="feature-title">Melhores Taxas</h3>
+          <p class="feature-desc">Taxas competitivas e transparentes, sempre as melhores.</p>
         </div>
-    </section>
 
-    <!-- Benefícios -->
-    <section class="beneficios">
-        <div class="container">
-            <h2 class="section-title">Benefícios do Moz P2P</h2>
-            <div class="beneficios-grid">
-                <div class="beneficio">
-                    <div class="beneficio-icon">🔒</div>
-                    <h3 class="beneficio-title">Segurança garantida</h3>
-                    <p class="beneficio-desc">Todas as transações protegidas com criptografia avançada</p>
-                </div>
-                <div class="beneficio">
-                    <div class="beneficio-icon">⚡</div>
-                    <h3 class="beneficio-title">Rapidez</h3>
-                    <p class="beneficio-desc">Negociações concluídas em minutos</p>
-                </div>
-                <div class="beneficio">
-                    <div class="beneficio-icon">🌍</div>
-                    <h3 class="beneficio-title">Flexibilidade</h3>
-                    <p class="beneficio-desc">Diversos métodos de pagamento disponíveis</p>
-                </div>
-                <div class="beneficio">
-                    <div class="beneficio-icon">📱</div>
-                    <h3 class="beneficio-title">Acessível</h3>
-                    <p class="beneficio-desc">Use no celular ou computador</p>
-                </div>
-            </div>
+        <div class="feature-card">
+          <div class="feature-icon-wrapper">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 8V12M12 16H12.01M21 12C21 16.97 12 21 12 21C7.03 21 3 16.97 3 12C3 7.03 7.03 3 12 3C16.97 3 21 7.03 21 12Z" stroke="currentColor" stroke-width="2.5"/>
+            </svg>
+          </div>
+          <h3 class="feature-title">Suporte 24/7</h3>
+          <p class="feature-desc">Equipe dedicada disponível 24 horas para você.</p>
         </div>
-    </section>
 
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="container">
-            <p class="footer-text">© 2025 Moz P2P – Todos os direitos reservados.</p>
+        <div class="feature-card">
+          <div class="feature-icon-wrapper">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M17 21V19C17 16.79 13 15 13 15H5C2.79 15 1 16.79 1 19V21M23 21V19C23 16.79 19 15 19 15H17" stroke="currentColor" stroke-width="2.5"/>
+              <circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="2.5"/>
+            </svg>
+          </div>
+          <h3 class="feature-title">Comunidade Ativa</h3>
+          <p class="feature-desc">Mais de 7K usuários confiam na plataforma diariamente.</p>
         </div>
-    </footer>
+      </div>
+    </div>
+  </div>
 
-    <script>
-        // Efeito de scroll no header
-        window.addEventListener('scroll', function() {
-            const header = document.getElementById('header');
-            if (window.scrollY > 50) {
-                header.classList.add('scrolled');
-            } else {
-                header.classList.remove('scrolled');
-            }
-        });
+  <!-- Como Funciona -->
+  <div class="steps">
+    <div class="container">
+      <h2 class="section-title">Como Funciona</h2>
+      <p class="section-subtitle">
+        Em apenas 3 passos simples você está negociando USDT com segurança total.
+      </p>
 
-        // Animação de digitação para o título
-        function typeWriter(element, text, speed = 100) {
-            let i = 0;
-            element.innerHTML = '';
-            
-            function type() {
-                if (i < text.length) {
-                    element.innerHTML += text.charAt(i);
-                    i++;
-                    setTimeout(type, speed);
-                }
-            }
-            type();
-        }
+      <div class="steps-container">
+        <div class="step-card">
+          <div class="step-number">1</div>
+          <h3 class="step-title">→ Crie sua Conta</h3>
+          <p class="step-desc">Registro rápido e seguro em menos de 2 minutos.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-number">2</div>
+          <h3 class="step-title">Crie uma Ordem</h3>
+          <p class="step-desc">Compra ou venda de USDT com apenas alguns cliques.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-number">3</div>
+          <h3 class="step-title">Negocie USDT</h3>
+          <p class="step-desc">Instantaneamente com as melhores taxas do mercado.</p>
+        </div>
+      </div>
+    </div>
+  </div>
 
-        // Iniciar animação de digitação
-        window.addEventListener('DOMContentLoaded', (event) => {
-            const heroTitle = document.querySelector('.hero-title');
-            const originalText = heroTitle.textContent;
-            heroTitle.style.minHeight = heroTitle.offsetHeight + 'px';
-            typeWriter(heroTitle, originalText, 120);
-        });
+  <!-- CTA Final -->
+  <div class="cta">
+    <h2 class="cta-title">Pronto para Começar?</h2>
+    <p class="cta-subtitle">
+      Junte-se a milhares de moçambicanos que já confiam em nossa plataforma.
+    </p>
+    <div class="cta-buttons">
+      <a href="https://mozp2p.base44.app/Dashboard" class="hero-cta">Começar Agora</a>
+      <a href="https://mozp2p.base44.app/Dashboard" class="hero-cta" style="background: transparent; border: 2px solid var(--primary); color: var(--primary);">Acessar Plataforma</a>
+    </div>
+  </div>
 
-        // Animação de entrada suave ao rolar
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.style.opacity = 1;
-                    entry.target.style.transform = 'translateY(0)';
-                }
-            });
-        }, { threshold: 0.1, rootMargin: '0px 0px -100px 0px' });
+  <!-- Rodapé Minimalista -->
+  <footer class="footer">
+    suporte: mozp2p.moz@gmail.com | +258 83 820 0111 | Maputo, Moçambique
+  </footer>
 
-        document.querySelectorAll('.step, .beneficio').forEach(el => {
-            el.style.opacity = 0;
-            el.style.transform = 'translateY(20px)';
-            el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-            observer.observe(el);
-        });
-    </script>
 </body>
 </html>
